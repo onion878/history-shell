@@ -1,0 +1,70 @@
+{
+  "name": "history-shell",
+  "version": "1.0.0",
+  "description": "A ssh and terminal history application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --x64",
+    "postinstall": "install-app-deps"
+  },
+  "author": {
+    "name": "Onion",
+    "email": "a2214839296a@gmail.com"
+  },
+  "homepage": "https://github.com/onion878/GenerateTool",
+  "license": "CC0-1.0",
+  "url": "https://github.com/onion878",
+  "build": {
+    "appId": "onion.app.HistoryShell",
+    "asar": true,
+    "mac": {
+      "icon": "assets/image/icon.png",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "icon": "assets/image/icon.png",
+      "target": [
+        "nsis",
+        "zip"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "snap",
+        "deb"
+      ],
+      "icon": "assets/image/icon.icns"
+    }
+  },
+  "repository": "https://github.com/electron/electron-quick-start",
+  "keywords": [
+    "shell",
+    "ssh",
+    "history",
+    "terminal",
+    "electron"
+  ],
+  "dependencies": {
+    "ansi-colors": "^4.1.1",
+    "app-root-path": "^3.0.0",
+    "cjson": "^0.5.0",
+    "node-pty": "0.9.0",
+    "open": "^7.0.0",
+    "ssh2": "^0.8.9",
+    "xterm": "4.9.0",
+    "xterm-addon-fit": "0.4.0",
+    "xterm-addon-search": "^0.7.0",
+    "xterm-addon-search-bar": "^0.2.0",
+    "xterm-addon-unicode11": "^0.2.0",
+    "xterm-addon-web-links": "^0.4.0"
+  },
+  "devDependencies": {
+    "electron": "^11.1.1",
+    "electron-builder": "^22.8.0"
+  }
+}
