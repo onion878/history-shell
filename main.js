@@ -1,12 +1,16 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
-const path = require('path')
+const {app, BrowserWindow, dialog} = require('electron');
+const path = require('path');
+app.showExitPrompt = true;
 app.allowRendererProcessReuse = false;
+const setting = require('./app/data/setting');
+
 function createWindow() {
     // Create the browser window.
-    const mainWindow = new BrowserWindow({
+    let mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
+        show: false,
         frame: false,
         enableLargerThanScreen: true,
         webPreferences: {
@@ -14,6 +18,16 @@ function createWindow() {
             enableRemoteModule: true,
             preload: path.join(__dirname, 'preload.js')
         }
+    });
+    setting.getWin().then(d => {
+        if (d) {
+            mainWindow.setSize(d.width, d.height);
+            mainWindow.setPosition(d.x, d.y);
+            if (d.maximal) {
+                mainWindow.maximize();
+            }
+        }
+        mainWindow.show();
     })
 
     // and load the index.html of the app.
@@ -22,6 +36,46 @@ function createWindow() {
     });
     // Open the DevTools.
     // mainWindow.webContents.openDevTools()
+    mainWindow.on('closed', function () {
+        mainWindow = null;
+    });
+    mainWindow.on('close', function (e) {
+        if (app.showExitPrompt) {
+            e.preventDefault();
+            dialog.showMessageBox(mainWindow, {
+                type: 'question',
+                buttons: ['否', '是'],
+                title: '提示',
+                defaultId: 1,
+                message: '是否退出?',
+                noLink: true
+            }).then(({response}) => {
+                if (response === 1) {
+                    app.showExitPrompt = false;
+                    let [x, y] = mainWindow.getPosition();
+                    let [width, height] = mainWindow.getSize();
+                    const maximal = mainWindow.isMaximized();
+                    if (maximal) {
+                        setting.setWin({
+                            maximal: maximal
+                        }).then(() => {
+                            mainWindow.close();
+                        });
+                    } else {
+                        setting.setWin({
+                            x: x,
+                            y: y,
+                            width: width,
+                            height: height,
+                            maximal: maximal
+                        }).then(() => {
+                            mainWindow.close();
+                        });
+                    }
+                }
+            });
+        }
+    })
 }
 
 // This method will be called when Electron has finished

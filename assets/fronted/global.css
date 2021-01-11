@@ -9,6 +9,7 @@ body {
 	margin: 0;
 	box-sizing: border-box;
 	font-size: 13px;
+	overflow: hidden;
 	font-family: Segoe WPC, Segoe UI, Microsoft YaHei, sans-serif;
 }
 

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   export let theme, msg;
   
   import { createEventDispatcher } from "svelte";

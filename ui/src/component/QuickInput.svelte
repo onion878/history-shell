@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   export let theme, msg, loading, show;
   import { afterUpdate } from "svelte";
   let input;

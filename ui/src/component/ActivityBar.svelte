@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   export let theme, msg;
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
@@ -57,7 +57,7 @@
     .monaco-action-bar
     .action-item.checked
     > .action-label {
-    background: var(--activity-focus);
+    color: var(--activity-focus);
   }
 
   .activitybar > .content .monaco-action-bar .action-label {
@@ -66,25 +66,25 @@
     height: 40px;
     line-height: 40px;
     margin-right: 0;
-    padding: 0 0 0 50px;
+    padding: 0 0 0 9px;
     box-sizing: border-box;
     font-size: 15px;
     cursor: pointer;
-    background: var(--activity-color);
+    font-size: 28px;
+    font-family: 'Icofont';
+    color: var(--activity-color);
   }
 
   .activitybar > .content .monaco-action-bar .action-label:hover {
-    background: var(--activity-focus);
+    color: var(--activity-focus);
   }
 
-  .activitybar .monaco-action-bar .action-label.template {
-    -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg fill='none' height='28' viewBox='0 0 28 28' width='28' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M14.965 7H6.049S4 7.078 4 9v15s0 2 2.049 2l11.267-.004C19.364 26 19.364 24 19.364 24V12.509zm-1.746 2v5h4.097v10H6.049V9zm5.642-6h-8.699s-2.065.016-2.08 2h8.21v.454L20.317 10h1.095v12c2.048 0 2.048-1.995 2.048-1.995V8.648z' fill='%23fff'/%3E%3C/svg%3E")
-      no-repeat 50% 50%;
+  .activitybar .monaco-action-bar .action-label.template:before {
+    content: '\eeff';
   }
 
-  .activitybar .monaco-action-bar .action-label.script {
-    -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg fill='none' height='28' viewBox='0 0 1024 1024' width='25' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M960 384l-128 128V320H192v448h384l-128 128H64V64h896v320z m-119.808 194.24l90.5088 90.5152L576 1024H486.4v-91.4048l353.792-354.3488z m45.216-45.2864l48.0832-48.1536L1024 575.3088l-48.0832 48.1536-90.5088-90.5088z' fill='%23fff'/%3E%3C/svg%3E")
-      no-repeat 50% 50%;
+  .activitybar .monaco-action-bar .action-label.script:before {
+    content: '\ec5b';
   }
 </style>
 

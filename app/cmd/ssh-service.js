@@ -9,15 +9,13 @@ class ShellService extends BaseService{
         this.term = null;
         this.stream = null;
         this.fitAddon = new FitAddon();
-        this.color1 = '#424242';
-        this.color2 = '#222';
     }
 
-    init(element) {
+    init(element, config) {
         const that = this;
         return new Promise((resolve, reject) => {
             if (that.stream == null) {
-                that.initSSH(resolve, element);
+                that.initSSH(resolve, element, config);
             } else {
                 that.initXterm(resolve, element);
                 resolve(that.stream, that.term);
@@ -25,7 +23,7 @@ class ShellService extends BaseService{
         });
     }
 
-    initSSH(resolve, element) {
+    initSSH(resolve, element, config) {
         const that = this;
         const conn = new Client();
         conn.on('ready', function () {
@@ -43,10 +41,10 @@ class ShellService extends BaseService{
                 resolve(that.stream, that.term);
             });
         }).connect({
-            host: '172.16.114.31',
-            port: 22,
-            username: 'root',
-            password: '1234',
+            host: config.host,
+            port: config.port,
+            username: config.username,
+            password: config.password,
         });
     }
 
@@ -56,10 +54,10 @@ class ShellService extends BaseService{
         element.style.overflow = 'hidden';
         that.term.open(element);
         that.term.loadAddon(that.fitAddon);
-        that.fitAddon.fit();
         that.term.onData(function (data) {
             that.write(data);
         });
+        that.fitTerm();
         that.initXtermSuccess();
     }
 
@@ -93,12 +91,11 @@ class ShellService extends BaseService{
     }
 
     destroy() {
-        if (this.stream != null) {
-            this.stream.end();
-            this.stream = null;
-            this.term = null;
-        }
+        this.write('exit\n');
+        this.stream?.end();
+        this.stream = null;
+        this.term = null;
     }
 }
 
-module.exports = new ShellService();
+module.exports = ShellService;

@@ -9,15 +9,15 @@ class TerminalService extends BaseService {
         super();
         this.nowPty = null;
         this.fitAddon = new FitAddon();
-        this.color1 = '#424242';
-        this.color2 = '#222';
     }
 
-    init(element) {
+    init(element, path) {
         const that = this;
         return new Promise((resolve, reject) => {
             let terminal = process.env[os.platform() == 'win32' ? 'COMSPEC' : 'SHELL'];
-            // terminal = 'C:\\Program Files\\Git\\bin\\bash.exe';
+            if (path) {
+                terminal = path;
+            }
             if (this.nowPty == null) {
                 that.initNodePty(terminal, resolve, element);
             } else {
@@ -30,10 +30,10 @@ class TerminalService extends BaseService {
     initNodePty(userBash, resolve, element) {
         const that = this;
         const ptyProcess = pty.spawn(userBash, [], {
-            name: 'xterm-color',
+            name: 'terminal',
             cols: 180,
             rows: 30,
-            cwd: process.env.HOME,
+            cwd: os.homedir(),
             env: process.env
         });
         that.nowPty = ptyProcess;
@@ -46,14 +46,14 @@ class TerminalService extends BaseService {
 
     initXterm(userBash, resolve, element) {
         const that = this;
-        that.term = new Terminal(this.getTermOptions());
+        that.term = new Terminal(that.getTermOptions());
         element.style.overflow = 'hidden';
         that.term.open(element);
         that.term.loadAddon(that.fitAddon);
-        that.fitAddon.fit();
         that.term.onData(function (data) {
             that.write(data);
         });
+        that.fitTerm();
         that.initXtermSuccess();
     }
 
@@ -81,12 +81,11 @@ class TerminalService extends BaseService {
     }
 
     destroy() {
-        if (this.nowPty != null) {
-            this.nowPty.destroy();
-            this.nowPty = null;
-            this.term = null;
-        }
+        this.write('exit\n');
+        this.nowPty?.kill();
+        this.nowPty = null;
+        this.term = null;
     }
 }
 
-module.exports = new TerminalService();
+module.exports = TerminalService;

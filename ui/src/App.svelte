@@ -1,8 +1,5 @@
-<script>
-    import {onMount} from "svelte";
-    import { watchResize } from "svelte-watch-resize";
-    const terminal = require("./app/cmd/terminal-service");
-    export let name;
+<script lang="ts">
+    export let name: string;
     export let theme;
     export let quickShow = "none";
     let mainLoading = "block";
@@ -10,10 +7,12 @@
     import StatusBar from "./component/StatusBar.svelte";
     import ActivityBar from "./component/ActivityBar.svelte";
     import SplitBar from "./component/SplitBar.svelte";
-    import SideBar from "./component/SideBar.svelte";
+    import ConfigPanel from "./component/ConfigPanel.svelte";
     import QuickInput from "./component/QuickInput.svelte";
+    import TabContent from "./component/TabContent.svelte";
+    import Modal from "./component/Modal.svelte";
 
-    let msg = "hello";
+    let msg = "该项目进行中...";
     const toggleConsole = () => {
         msg = msg + "Onion ";
     };
@@ -22,13 +21,46 @@
     };
 
     console.log(JSON.stringify(theme.colors));
-    let xterm;
-    onMount(() => {
-        terminal.init(xterm);
-    });
-    const fitTerm = () => {
-        terminal.fitTerm();
-        console.log('fit');
+    let tabs = [], nowTab = 0;
+    const addTab = (tab) => {
+        if (tab.id == null) {
+            return;
+        }
+        let addFlag = true, now;
+        tabs.some((t, i) => {
+            if (t.id == tab.id) {
+                addFlag = false;
+                now = i;
+                if (t.close) {
+                    t.close = false;
+                }
+                return true;
+            }
+        });
+        if (addFlag) {
+            tabs.push(tab);
+        }
+        tabs = [...tabs];
+        nowTab = null;
+        setTimeout(() => {
+            if (addFlag) {
+                nowTab = tabs.length - 1;
+            } else {
+                nowTab = now;
+            }
+        }, 1);
+        console.log(tabs);
+    }
+    const changeTab = ({detail}) => {
+        tabs = detail;
+    }
+    const treeClick = ({detail}) => {
+        if (detail.type == 'folder') return;
+        if (detail.key == 'ssh') {
+            addTab({id: detail.id, name: detail.name, close: false, config: detail, icon: detail.icon});
+        } else if (detail.key == 'terminal') {
+            addTab({id: detail.id, name: detail.name, close: false, type: 'terminal', path: detail.path, icon: detail.icon});
+        }
     }
 </script>
 
@@ -104,31 +136,39 @@
         }
     </style>
 </svelte:head>
-<div
-        class="main"
-        style="--background: {theme.colors.foreground}; --color: {theme.colors['background']};
+<div class="main" style="--background: {theme.colors.foreground}; --color: {theme.colors['background']};
   --focus:{theme.colors['focus']}; --focus-border: {theme.colors['focusBorder']};
   --shadow: {theme.colors['widget.shadow']}">
-    <TitleBar title="Onion" bind:theme bind:msg/>
-    <div class="monaco-progress-container">
-        <div
-                class="progress-bit"
-                style="background-color: {theme.colors['progressBar.background']};opacity:
-      1;display:{mainLoading}"/>
+    <TitleBar {theme} bind:msg/>
+    <div class="monaco-progress-container" style="display: none;">
+        <div class="progress-bit"
+             style="background-color: {theme.colors['progressBar.background']};opacity:1;display:{mainLoading}"/>
     </div>
-    <ActivityBar title="Onion" bind:theme bind:msg/>
+    <ActivityBar {theme} bind:msg/>
     <div class="content">
         <SplitBar>
             <div slot="left" style="width: 100%;height: 100%;">
-                <SideBar bind:theme bind:msg/>
+                <ConfigPanel {theme} on:addSSH={treeClick} on:treeClick={treeClick}/>
             </div>
-            <div slot="right" style="height: 100%;" use:watchResize={fitTerm} bind:this={xterm}></div>
+            <div slot="right" style="height: 100%;">
+                <SplitBar center="left" width="150px">
+                    <div slot="left" style="width: 100%;height: 100%;">
+                        <TabContent {theme} bind:msg {tabs} {nowTab} on:changeTab={changeTab}/>
+                    </div>
+                    <div slot="right" style="height: 100%;">
+                    </div>
+                </SplitBar>
+            </div>
         </SplitBar>
     </div>
     <StatusBar
-            bind:theme
+            {theme}
             bind:msg
             on:toggleConsole={toggleConsole}
             on:toggleTerminal={toggleTerminal}/>
-    <QuickInput bind:theme bind:msg bind:show={quickShow}/>
+    <QuickInput {theme} bind:msg bind:show={quickShow}/>
+    <Modal {theme}>
+        <input type="text"><br/>
+        <input type="text"><br/>
+    </Modal>
 </div>

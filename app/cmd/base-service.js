@@ -8,9 +8,12 @@ const themes = require('../../assets/config/windows-terminal-themes.json');
 class BaseService {
 
     constructor() {
+        this.id = Math.floor(Math.random() * 10000);
         this.term = null;
         this.searchBar = null;
         this.isWrite = true;
+        this.options = null;
+        this.getTermOptions();
         c.theme({
             danger: c.red,
             dark: c.dim.gray,
@@ -46,26 +49,33 @@ class BaseService {
                 selection: theme.brightWhite,
                 ...theme
             };
-            this.term?.setOption('theme', d);
+            // this.term?.setOption('theme', d);
             i++;
         }, 1000);
     }
 
     getTermOptions() {
         const that = this;
-        // Initialize xterm.js and attach it to the DOM
-        let font = '"Cascadia Code","Fira Mono","IBM Plex Mono","Menlo",Consolas,monospace,monospace',
-            fontSize = 13;
-        const theme = themes[8];
-        return {
-            // fontSize: fontSize,
-            // fontFamily: font,
-            theme: {
-                cursor: theme.brightBlack,
-                selection: theme.brightWhite,
-                ...theme
-            }
-        };
+        if (that.options == null) {
+            // Initialize xterm.js and attach it to the DOM
+            let font = '"Cascadia Code","Fira Mono","IBM Plex Mono","Menlo",Consolas,monospace,monospace',
+                fontSize = 13;
+            const theme = themes[21];
+            that.options = {
+                // fontSize: fontSize,
+                // fontFamily: font,
+                theme: {
+                    cursor: theme.brightBlack,
+                    selection: theme.brightWhite,
+                    ...theme
+                }
+            };
+        }
+        return that.options;
+    }
+
+    getBackgroundColor() {
+        return this.options.theme.background;
     }
 
     initXtermSuccess() {
@@ -136,7 +146,7 @@ class BaseService {
     }
 
     writeToXterm(shell) {
-        this.term.write(this.changeColor(shell));
+        this.term?.write(this.changeColor(shell));
     }
 
     changeColor(shell) {
