@@ -1,5 +1,6 @@
 const help = require('../utils/help')
 const Datastore = require('nedb');
+const fs = require('fs');
 
 class ConfigData {
     constructor() {
@@ -45,6 +46,29 @@ class ConfigData {
     }
 
     getLocalTerminal() {
+        const folder = [];
+        const git = 'C:/Program Files/Git/bin/bash.exe';
+        if (fs.existsSync(git)) {
+            folder.push({
+                type: "file",
+                key: "terminal",
+                name: "git",
+                id: 'git',
+                path: 'C:/Program Files/Git/bin/bash.exe',
+                icon: "./assets/image/git.svg",
+            });
+        }
+        const wsl = 'C:/Windows/System32/wsl.exe';
+        if (fs.existsSync(wsl)) {
+            folder.push({
+                type: "file",
+                key: "terminal",
+                name: "git",
+                id: 'git',
+                path: 'C:/Windows/System32/wsl.exe',
+                icon: "./assets/image/git.svg",
+            });
+        }
         return [
             {
                 type: "folder",
@@ -60,14 +84,7 @@ class ConfigData {
                         id: 'cmd',
                         icon: "./assets/image/terminal.svg",
                     },
-                    {
-                        type: "file",
-                        key: "terminal",
-                        name: "git",
-                        id: 'git',
-                        path: 'C:\\Program Files\\Git\\bin\\bash.exe',
-                        icon: "./assets/image/git.svg",
-                    }
+                    ...folder,
                 ]
             }
         ];
@@ -83,6 +100,7 @@ class ConfigData {
                         d.id = d._id;
                         d.icon = "./assets/image/ssh.svg";
                         if (d.type == 'folder') {
+                            d.icon = "./assets/image/folder.svg";
                             d.expanded = false;
                         }
                     });

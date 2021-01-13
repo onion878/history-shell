@@ -76,7 +76,7 @@
         groupName = '';
     }
     // new ssh config
-    let editData = {name: null, host: null, port: 22, username: null, password: null};
+    let editData = {name: null, host: null, port: 22, username: null, password: null, id: null};
     const saveSSH = () => {
         if (!validateData(editData, {parentId: true, children: true, icon: true, id: true})) {
             showError("请填写完所有数据!");
@@ -89,23 +89,44 @@
             parentId: parentId, ...editData
         }).then(() => getAllTree());
         dispatch('addSSH', editData);
-        editData = {name: null, host: null, port: 22, username: null, password: null};
+        editData = {name: null, host: null, port: 22, username: null, password: null, id: null};
     }
     // tree right click
-    let menuX, menuY, menuShow = false, nowItem;
-    let menu = [
-        {name: '新建组', key: 'group', icon: 'icofont-ui-folder'},
-        {name: '新建SSH配置', key: 'config', icon: 'icofont-database-add'},
-        {type: 'separator'},
-        {name: '复制', key: 'copy', icon: 'icofont-ui-copy'},
-        {name: '编辑', key: 'edit', icon: 'icofont-ui-edit'},
-        {name: '删除', key: 'delete', icon: 'icofont-ui-delete'},
+    let menuX, menuY, menuShow = false, nowItem, terminalShow = false;
+    let menu = [];
+    let terminalMenu = [
+        {name: '新建窗口', key: 'open', icon: 'icofont-interface'},
     ];
     const treeRightClick = ({detail}) => {
         menuX = detail.x;
         menuY = detail.y;
-        menuShow = !menuShow;
         nowItem = detail.data;
+        if (nowItem.key == 'terminal') {
+            if (nowItem.type == 'file') {
+                terminalShow = !terminalShow;
+            }
+        } else {
+            if (nowItem.type == 'file') {
+                menu = [
+                    {name: '新建窗口', key: 'open', icon: 'icofont-interface'},
+                    {type: 'separator'},
+                    {name: '复制', key: 'copy', icon: 'icofont-ui-copy'},
+                    {name: '编辑', key: 'edit', icon: 'icofont-ui-edit'},
+                    {name: '删除', key: 'delete', icon: 'icofont-ui-delete'},
+                ];
+            } else {
+                menu = [
+                    {name: '新建组', key: 'group', icon: 'icofont-ui-folder'},
+                    {name: '新建SSH配置', key: 'config', icon: 'icofont-database-add'},
+                    {type: 'separator'},
+                    {name: '复制', key: 'copy', icon: 'icofont-ui-copy'},
+                    {name: '编辑', key: 'edit', icon: 'icofont-ui-edit'},
+                    {name: '删除', key: 'delete', icon: 'icofont-ui-delete'},
+                ];
+            }
+            menuShow = !menuShow;
+        }
+        console.log(nowItem);
     }
     const getListId = (item) => {
         let list = [];
@@ -145,16 +166,19 @@
                 editData = nowItem;
                 addSSHFlag = !addSSHFlag;
             }
-        } else {
+        } else if (detail.key == 'delete') {
             showConfirm(`确认删除[${nowItem.name}]吗?`).then(({response}) => {
                 if (response === 1) {
                     config.deleteByIdList(getListId(nowItem)).then(() => getAllTree());
                 }
             })
+        } else {
+            treeClick({detail: {...nowItem, id: nowItem.id + '_' + Math.floor(Math.random() * 1000)}});
         }
     }
     // return list tree click func
     const treeClick = ({detail}) => {
+        console.log(detail);
         dispatch('treeClick', detail);
     }
 </script>
@@ -165,7 +189,11 @@
 <SideBar bind:theme={theme} title="所有配置" {tools} on:toolClick={toolClick}>
     <ListTree bind:theme={theme} bind:data={tree} on:rightClick={treeRightClick} on:click={treeClick}/>
 </SideBar>
-<ContextMenu bind:theme={theme} bind:data={menu} on:click={menuClick} bind:show={menuShow} bind:x={menuX} bind:y={menuY}
+<ContextMenu bind:theme={theme} bind:data={menu} on:click={menuClick} bind:show={menuShow}
+             bind:x={menuX} bind:y={menuY}
+             width="120"/>
+<ContextMenu bind:theme={theme} bind:data={terminalMenu} on:click={menuClick} bind:show={terminalShow}
+             bind:x={menuX} bind:y={menuY}
              width="120"/>
 <Modal bind:theme={theme} bind:show={addFolderFlag} title="新建组" on:save={saveGroup}>
     <Input bind:theme={theme} placeholder="名称" bind:value={groupName}/>

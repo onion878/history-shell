@@ -138,8 +138,7 @@
                         <div class="monaco-action-bar animated">
                             <ul
                                     class="actions-container"
-                                    role="toolbar"
-                                    aria-label="demo操作">
+                                    role="toolbar">
                                 {#each tools as tool}
                                     <li
                                             class="action-item"

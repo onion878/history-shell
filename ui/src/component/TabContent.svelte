@@ -8,6 +8,7 @@
     export let theme, msg, tabs = [], nowTab = 0;
     const changeTab = (index) => {
         nowTab = index;
+        dispatch('change', tabs[nowTab]);
     }
     const closeTab = (index, e) => {
         e.stopPropagation();
@@ -43,6 +44,7 @@
             } else {
                 nowTab = before;
             }
+            dispatch('change', tabs[nowTab]);
         }
     }
 </script>

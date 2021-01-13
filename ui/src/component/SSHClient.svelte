@@ -6,7 +6,7 @@
     const SSHService = require('./app/cmd/ssh-service');
     const terminal = new SSHService();
     let dom, first: boolean = false;
-    export let init, config,id;
+    export let init, config, id;
     onMount(() => {
         first = true;
         if (init) {

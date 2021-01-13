@@ -1,4 +1,6 @@
 <script lang="ts">
+    import {getTerminal} from "./component/utils";
+
     export let name: string;
     export let theme;
     export let quickShow = "none";
@@ -11,6 +13,7 @@
     import QuickInput from "./component/QuickInput.svelte";
     import TabContent from "./component/TabContent.svelte";
     import Modal from "./component/Modal.svelte";
+    import HistoryPanel from "./component/HistoryPanel.svelte";
 
     let msg = "该项目进行中...";
     const toggleConsole = () => {
@@ -22,11 +25,24 @@
 
     console.log(JSON.stringify(theme.colors));
     let tabs = [], nowTab = 0;
+    let historyName;
+    const setHistoryName = (tab) => {
+        if (tab == null) {
+            historyName = 'null';
+            return;
+        }
+        if (tab.config) {
+            historyName = tab.config.host
+        } else {
+            historyName = tab.path;
+        }
+    }
     const addTab = (tab) => {
         if (tab.id == null) {
             return;
         }
         let addFlag = true, now;
+        setHistoryName(tab);
         tabs.some((t, i) => {
             if (t.id == tab.id) {
                 addFlag = false;
@@ -49,7 +65,6 @@
                 nowTab = now;
             }
         }, 1);
-        console.log(tabs);
     }
     const changeTab = ({detail}) => {
         tabs = detail;
@@ -59,8 +74,21 @@
         if (detail.key == 'ssh') {
             addTab({id: detail.id, name: detail.name, close: false, config: detail, icon: detail.icon});
         } else if (detail.key == 'terminal') {
-            addTab({id: detail.id, name: detail.name, close: false, type: 'terminal', path: detail.path, icon: detail.icon});
+            addTab({
+                id: detail.id,
+                name: detail.name,
+                close: false,
+                type: 'terminal',
+                path: detail.path,
+                icon: detail.icon
+            });
         }
+    }
+    const changeHistory = ({detail}) => {
+        setHistoryName(detail);
+    }
+    const addWrite = ({detail}) => {
+        getTerminal(tabs[nowTab].id).write(detail.input);
     }
 </script>
 
@@ -151,11 +179,13 @@
                 <ConfigPanel {theme} on:addSSH={treeClick} on:treeClick={treeClick}/>
             </div>
             <div slot="right" style="height: 100%;">
-                <SplitBar center="left" width="150px">
+                <SplitBar center="left" width="250px">
                     <div slot="left" style="width: 100%;height: 100%;">
-                        <TabContent {theme} bind:msg {tabs} {nowTab} on:changeTab={changeTab}/>
+                        <TabContent {theme} bind:msg {tabs} {nowTab} on:changeTab={changeTab}
+                                    on:change={changeHistory}/>
                     </div>
                     <div slot="right" style="height: 100%;">
+                        <HistoryPanel {theme} bind:name={historyName} on:click={addWrite}/>
                     </div>
                 </SplitBar>
             </div>

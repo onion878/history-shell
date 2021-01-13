@@ -7,7 +7,9 @@ const FitAddon = require('xterm-addon-fit').FitAddon;
 class TerminalService extends BaseService {
     constructor() {
         super();
+        this.cmdFlag = false;
         this.nowPty = null;
+        this.initMsg = "";
         this.fitAddon = new FitAddon();
     }
 
@@ -16,7 +18,13 @@ class TerminalService extends BaseService {
         return new Promise((resolve, reject) => {
             let terminal = process.env[os.platform() == 'win32' ? 'COMSPEC' : 'SHELL'];
             if (path) {
+                that.name = path;
                 terminal = path;
+            } else {
+                that.name = 'base';
+            }
+            if (terminal.indexOf('cmd.exe') > -1) {
+                this.cmdFlag = true;
             }
             if (this.nowPty == null) {
                 that.initNodePty(terminal, resolve, element);
@@ -29,18 +37,23 @@ class TerminalService extends BaseService {
 
     initNodePty(userBash, resolve, element) {
         const that = this;
-        const ptyProcess = pty.spawn(userBash, [], {
-            name: 'terminal',
-            cols: 180,
-            rows: 30,
-            cwd: os.homedir(),
-            env: process.env
-        });
-        that.nowPty = ptyProcess;
+        try {
+            const ptyProcess = pty.spawn(userBash, [], {
+                name: 'terminal',
+                cols: 180,
+                rows: 30,
+                cwd: os.homedir(),
+                env: process.env
+            });
+            that.nowPty = ptyProcess;
+            that.nowPty.onData(function (data) {
+                that.writeToXterm(data);
+            });
+        } catch (e) {
+            this.initMsg = e.toString();
+            this.term?.write(that.initMsg);
+        }
         that.initXterm(userBash, resolve, element);
-        that.nowPty.onData(function (data) {
-            that.writeToXterm(data);
-        });
         resolve(that.nowPty, that.term);
     }
 
@@ -53,6 +66,7 @@ class TerminalService extends BaseService {
         that.term.onData(function (data) {
             that.write(data);
         });
+        that.term.write(that.initMsg);
         that.fitTerm();
         that.initXtermSuccess();
     }
@@ -77,6 +91,7 @@ class TerminalService extends BaseService {
     write(shell) {
         if (this.nowPty != null && this.isWrite) {
             this.nowPty.write(shell);
+            this.writeAfter(shell);
         }
     }
 

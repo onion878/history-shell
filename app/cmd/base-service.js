@@ -4,15 +4,18 @@ const SearchAddonBar = require('xterm-addon-search-bar').SearchBarAddon;
 const Unicode11Addon = require('xterm-addon-unicode11').Unicode11Addon;
 const WebLinksAddon = require('xterm-addon-web-links').WebLinksAddon;
 const themes = require('../../assets/config/windows-terminal-themes.json');
+const rendererService = require('./renderer-service');
 
 class BaseService {
 
     constructor() {
-        this.id = Math.floor(Math.random() * 10000);
+        this.name = null;
         this.term = null;
         this.searchBar = null;
         this.isWrite = true;
         this.options = null;
+        this.key = null;
+        this.initFlag = false;
         this.getTermOptions();
         c.theme({
             danger: c.red,
@@ -41,17 +44,13 @@ class BaseService {
                 color: c.primary.underline
             }
         ];
-        let i = 0;
-        setInterval(() => {
-            const theme = themes[i];
-            const d = {
-                cursor: theme.brightBlack,
-                selection: theme.brightWhite,
-                ...theme
-            };
-            // this.term?.setOption('theme', d);
-            i++;
-        }, 1000);
+        // const theme = themes[i];
+        // const d = {
+        //     cursor: theme.brightBlack,
+        //     selection: theme.brightWhite,
+        //     ...theme
+        // };
+        // this.term?.setOption('theme', d);
     }
 
     getTermOptions() {
@@ -102,16 +101,18 @@ class BaseService {
                 navigator.clipboard.readText().then(r => {
                     if (r.length > 0) {
                         that.write(r);
+                        rendererService.resetTerm();
+                        rendererService.write(r);
+                        rendererService.saveHistory(that.name, true);
                     }
                 });
             }
-        })
+        });
         this.term.onKey(({domEvent}) => {
-            console.log(domEvent.key);
+            that.key = domEvent;
             if (domEvent.ctrlKey) {
                 switch (domEvent.key) {
                     case "f": {
-                        console.log(that.term);
                         this.isWrite = false;
                         that.searchBar?.show();
                         break;
@@ -120,6 +121,8 @@ class BaseService {
                         if (that.term.getSelection().length > 0) {
                             this.isWrite = false;
                             document.execCommand('copy');
+                        } else {
+                            rendererService.resetTerm();
                         }
                         break;
                     }
@@ -129,6 +132,9 @@ class BaseService {
                             this.isWrite = true;
                             if (r.length > 0) {
                                 that.write(r);
+                                rendererService.resetTerm();
+                                rendererService.write(r);
+                                rendererService.saveHistory(that.name, true);
                             }
                         });
                         break;
@@ -139,14 +145,40 @@ class BaseService {
             } else {
                 this.isWrite = true;
             }
-            if (domEvent.key == 'Escape') {
-                that.searchBar?.hidden();
+            switch (domEvent.key) {
+                case "Escape": {
+                    that.searchBar?.hidden();
+                    break;
+                }
+                case "Backspace": {
+                    break;
+                }
+                case "Enter": {
+                    break;
+                }
+                default:
             }
         });
     }
 
     writeToXterm(shell) {
         this.term?.write(this.changeColor(shell));
+        this.compileHistory(shell);
+    }
+
+    compileHistory(shell) {
+        if (!this.initFlag) return;
+        if (this.key == null) {
+            return;
+        }
+        if (this.key.key == 'Enter') {
+            rendererService.saveHistory(this.name);
+        } else {
+            if (!this.key.ctrlKey) {
+                rendererService.write(shell);
+            }
+        }
+        this.key = null;
     }
 
     changeColor(shell) {
@@ -161,6 +193,10 @@ class BaseService {
             }
         });
         return shell;
+    }
+
+    writeAfter(shell) {
+        this.initFlag = true;
     }
 }
 

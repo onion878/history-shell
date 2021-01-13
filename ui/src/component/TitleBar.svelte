@@ -30,7 +30,6 @@
         fileFlag = "none",
         helpFlag = "none";
     window.onclick = function (event: MouseEvent) {
-        console.log(event);
         const target: any = event.target;
         if (!target.matches(".menubar-menu-title")) {
             systemFlag = "none";

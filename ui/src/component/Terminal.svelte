@@ -12,11 +12,16 @@
         if (init) {
             initTerminal();
         }
+        dom.addEventListener('dragenter', dropHandler, false);
+        dom.addEventListener('dragleave', dropHandler, false);
+        dom.addEventListener('dragover', dropHandler, false);
+        dom.addEventListener('drop', dropHandler, false);
     });
 
     const initTerminal = () => {
         addTerminal(id, terminal);
         terminal.init(dom, path);
+        global.terminal = terminal;
         dom.style.background = terminal.getBackgroundColor();
     }
 
@@ -33,6 +38,23 @@
 
     const fit = () => {
         terminal.fitTerm();
+    }
+
+    const dropHandler = (ev) => {
+        // Prevent default behavior (Prevent file from being opened)
+        ev.preventDefault();
+        if (ev.dataTransfer.items) {
+            // Use DataTransferItemList interface to access the file(s)
+            for (let i = 0; i < ev.dataTransfer.items.length; i++) {
+                // If dropped items aren't files, reject them
+                if (ev.dataTransfer.items[i].kind === 'file') {
+                    const file: any = ev.dataTransfer.items[i].getAsFile();
+                    if (file) {
+                        terminal.write(file.path.replace(/\\/g, '/'));
+                    }
+                }
+            }
+        }
     }
 </script>
 

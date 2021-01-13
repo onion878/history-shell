@@ -3,7 +3,7 @@ const Terminal = require('xterm').Terminal;
 const FitAddon = require('xterm-addon-fit').FitAddon;
 const Client = require('ssh2').Client;
 
-class ShellService extends BaseService{
+class ShellService extends BaseService {
     constructor() {
         super();
         this.term = null;
@@ -26,8 +26,9 @@ class ShellService extends BaseService{
     initSSH(resolve, element, config) {
         const that = this;
         const conn = new Client();
+        this.name = config.host;
+        that.initXterm(resolve, element);
         conn.on('ready', function () {
-            console.log('Client :: ready');
             conn.shell(function (err, stream) {
                 if (err) throw err;
                 that.stream = stream;
@@ -37,9 +38,10 @@ class ShellService extends BaseService{
                 }).on('data', function (data) {
                     that.writeTerm(data);
                 });
-                that.initXterm(resolve, element);
                 resolve(that.stream, that.term);
             });
+        }).on('error', function (err) {
+            that.term?.write(err.toString());
         }).connect({
             host: config.host,
             port: config.port,
@@ -87,6 +89,7 @@ class ShellService extends BaseService{
     write(shell) {
         if (this.stream != null && this.isWrite) {
             this.stream.write(shell);
+            this.writeAfter(shell);
         }
     }
 

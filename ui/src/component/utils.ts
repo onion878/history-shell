@@ -20,6 +20,9 @@ export function addTerminal(id, terminal) {
     allTerminal[id] = terminal;
 }
 
+export function getTerminal(id) {
+    return allTerminal[id];
+}
 
 export function closeTerminal(id) {
     allTerminal[id].destroy();
