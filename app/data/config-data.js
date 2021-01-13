@@ -63,10 +63,10 @@ class ConfigData {
             folder.push({
                 type: "file",
                 key: "terminal",
-                name: "git",
-                id: 'git',
+                name: "wsl",
+                id: 'wsl',
                 path: 'C:/Windows/System32/wsl.exe',
-                icon: "./assets/image/git.svg",
+                icon: "./assets/image/ubuntu.svg",
             });
         }
         return [
