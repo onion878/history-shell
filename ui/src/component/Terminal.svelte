@@ -6,7 +6,7 @@
     const TerminalService = require('./app/cmd/terminal-service');
     const terminal = new TerminalService();
     let dom, first = false;
-    export let init, path = null, id;
+    export let theme, init, path = null, id;
     onMount(() => {
         first = true;
         if (init) {
@@ -21,8 +21,6 @@
     const initTerminal = () => {
         addTerminal(id, terminal);
         terminal.init(dom, path);
-        global.terminal = terminal;
-        dom.style.background = terminal.getBackgroundColor();
     }
 
     const startTerminal = (flag) => {
@@ -65,4 +63,4 @@
     }
 </style>
 
-<div class="terminal" use:watchResize={fit} bind:this={dom}></div>
+<div class="terminal" use:watchResize={fit} bind:this={dom} style="background-color: {theme.colors['termBackground']}"></div>

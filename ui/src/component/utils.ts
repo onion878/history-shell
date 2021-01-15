@@ -20,8 +20,17 @@ export function addTerminal(id, terminal) {
     allTerminal[id] = terminal;
 }
 
-export function getTerminal(id) {
-    return allTerminal[id];
+export function writeTerminal(id, shell) {
+    allTerminal[id].key = {key: 'write'};
+    allTerminal[id].writeToServer(shell);
+}
+
+export function changeAllTheme(index) {
+    let t;
+    for (const id in allTerminal) {
+        t = allTerminal[id].changeTheme(index);
+    }
+    return t;
 }
 
 export function closeTerminal(id) {

@@ -32,7 +32,6 @@ class ShellService extends BaseService {
             conn.shell(function (err, stream) {
                 if (err) throw err;
                 that.stream = stream;
-                // stream.setWindow(100, 100, 500, 500);
                 stream.on('close', function () {
                     conn.end();
                 }).on('data', function (data) {

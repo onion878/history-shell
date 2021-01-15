@@ -1,7 +1,7 @@
 <script lang="ts">
     import {onMount} from "svelte";
 
-    export let width = "200px", center = "right";
+    export let theme, width = "200px", center = "right";
     let container, left, right, handle, leftWidth;
     onMount(() => {
         initSplit();
@@ -14,6 +14,7 @@
             isResizing = true;
             lastDownX = e.clientX;
         };
+
         let oldX = 0;
 
         container.addEventListener('mouseup', function () {
@@ -70,7 +71,7 @@
         <div style="flex: 1 1 auto;">
             <slot name="left"/>
         </div>
-        <div class="drag" bind:this={handle} style="flex: 0 0 4px;"/>
+        <div class="drag" bind:this={handle} style="flex: 0 0 4px;background-color: {theme.colors['termBackground']}"/>
     </div>
     <div class="right_panel" bind:this={right} style="flex: {center == 'left'? '0 0 ' + width: '1 1 auto'};">
         <slot name="right"/>

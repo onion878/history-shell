@@ -1,5 +1,6 @@
 <script lang="ts">
-    import {getTerminal} from "./component/utils";
+    import {changeAllTheme, writeTerminal} from "./component/utils";
+    declare function require(arg: string);
 
     export let name: string;
     export let theme;
@@ -12,29 +13,43 @@
     import ConfigPanel from "./component/ConfigPanel.svelte";
     import QuickInput from "./component/QuickInput.svelte";
     import TabContent from "./component/TabContent.svelte";
-    import Modal from "./component/Modal.svelte";
     import HistoryPanel from "./component/HistoryPanel.svelte";
-
+    let index = 0;
     let msg = "该项目进行中...";
     const toggleConsole = () => {
         msg = msg + "Onion ";
+        changeTheme('night');
     };
     const toggleTerminal = () => {
         msg = msg + "Onion ==";
+        changeTheme('light');
     };
+
+    const changeTheme = (t) => {
+        index++;
+        const n = require('./app/utils/theme').getTheme(t);
+        const d = changeAllTheme(index);
+        if(d) {
+            n.colors.termBackground = d.background;
+        }
+        theme = n;
+    }
 
     console.log(JSON.stringify(theme.colors));
     let tabs = [], nowTab = 0;
-    let historyName;
+    let historyId,historyName;
     const setHistoryName = (tab) => {
         if (tab == null) {
             historyName = 'null';
+            historyId = 'base';
             return;
         }
         if (tab.config) {
-            historyName = tab.config.host
+            historyName = tab.config.host;
+            historyId = tab.id;
         } else {
             historyName = tab.path;
+            historyId = tab.id;
         }
     }
     const addTab = (tab) => {
@@ -88,7 +103,7 @@
         setHistoryName(detail);
     }
     const addWrite = ({detail}) => {
-        getTerminal(tabs[nowTab].id).write(detail.input);
+        writeTerminal(tabs[nowTab].id, detail.input);
     }
 </script>
 
@@ -174,18 +189,18 @@
     </div>
     <ActivityBar {theme} bind:msg/>
     <div class="content">
-        <SplitBar>
+        <SplitBar {theme}>
             <div slot="left" style="width: 100%;height: 100%;">
                 <ConfigPanel {theme} on:addSSH={treeClick} on:treeClick={treeClick}/>
             </div>
             <div slot="right" style="height: 100%;">
-                <SplitBar center="left" width="250px">
+                <SplitBar {theme} center="left" width="250px">
                     <div slot="left" style="width: 100%;height: 100%;">
                         <TabContent {theme} bind:msg {tabs} {nowTab} on:changeTab={changeTab}
                                     on:change={changeHistory}/>
                     </div>
                     <div slot="right" style="height: 100%;">
-                        <HistoryPanel {theme} bind:name={historyName} on:click={addWrite}/>
+                        <HistoryPanel {theme} bind:name={historyName} bind:id={historyId} on:click={addWrite}/>
                     </div>
                 </SplitBar>
             </div>
@@ -197,8 +212,4 @@
             on:toggleConsole={toggleConsole}
             on:toggleTerminal={toggleTerminal}/>
     <QuickInput {theme} bind:msg bind:show={quickShow}/>
-    <Modal {theme}>
-        <input type="text"><br/>
-        <input type="text"><br/>
-    </Modal>
 </div>

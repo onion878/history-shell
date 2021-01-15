@@ -6,7 +6,7 @@
     const SSHService = require('./app/cmd/ssh-service');
     const terminal = new SSHService();
     let dom, first: boolean = false;
-    export let init, config, id;
+    export let theme, init, config, id;
     onMount(() => {
         first = true;
         if (init) {
@@ -17,7 +17,6 @@
     const initTerminal = () => {
         addTerminal(id, terminal);
         terminal.init(dom, config);
-        dom.style.background = terminal.getBackgroundColor();
     }
 
     const startTerminal = (flag) => {
@@ -43,4 +42,4 @@
     }
 </style>
 
-<div class="terminal" use:watchResize={fit} bind:this={dom}></div>
+<div class="terminal" use:watchResize={fit} bind:this={dom} style="background-color: {theme.colors['termBackground']}"></div>

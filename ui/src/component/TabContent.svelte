@@ -150,9 +150,9 @@
         {#if tab.close === false}
             <div class="tab-list" style="display: {nowTab == i? 'block':'none'};">
                 {#if tab.type === 'terminal'}
-                    <Terminal init={nowTab==i} bind:id={tab.id} bind:path={tab.path}/>
+                    <Terminal init={nowTab==i} bind:id={tab.id} bind:path={tab.path} {theme}/>
                 {:else}
-                    <SSHClient init={nowTab==i} bind:id={tab.id} bind:config={tab.config}></SSHClient>
+                    <SSHClient init={nowTab==i} bind:id={tab.id} bind:config={tab.config} {theme}/>
                 {/if}
             </div>
         {/if}

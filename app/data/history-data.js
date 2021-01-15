@@ -10,14 +10,26 @@ class HistoryData {
 
     insert(input, name) {
         const that = this;
-        const data = {input: input, name: name, created: help.getNow(), group: input.split(/(\s+)/)[0]};
+        const data = {
+            input: input,
+            name: name,
+            created: help.getNow(),
+            group: input.split(/(\s+)/)[0],
+            uniqueId: input.replace(/\s+/g, "")
+        };
         return new Promise((resolve) => {
-            that.db.findOne({input: data['input']}, function (err, doc) {
-                that.db.remove({input: data['input'], name: name}, {multi: true}, function (err, numRemoved) {
+            that.db.findOne({uniqueId: data['uniqueId']}, function (err, doc) {
+                if (doc == null) {
+                    data.sort = new Date().getTime();
                     that.db.insert(data, function (err) {
                         resolve();
                     });
-                });
+                } else {
+                    doc.sort = new Date().getTime();
+                    that.db.update({_id: doc._id}, {$set: doc}, {}, function (err) {
+                        resolve();
+                    });
+                }
             });
         });
     }
@@ -36,7 +48,7 @@ class HistoryData {
         const that = this;
         return new Promise((resolve) => {
             that.db.find({name: name}, function (err, doc) {
-                resolve(doc);
+                resolve(doc.sort((a, b) => (a.sort < b.sort) ? 1 : ((b.sort < a.sort) ? -1 : 0)));
             });
         });
     }

@@ -2,9 +2,10 @@
     import {createEventDispatcher} from "svelte";
     import ContextMenu from "./ContextMenu.svelte";
     import {showConfirm} from "./dialog";
+    import {writeTerminal} from "./utils";
 
     const history = require('./app/data/history-data');
-    export let theme, name = '';
+    export let theme, name = 'null', id;
     const dispatch = createEventDispatcher();
     let data = [];
 
@@ -22,15 +23,20 @@
 
     let menuX, menuY, menuShow = false, nowItem;
     let menu = [
-        {name: '删除', key: 'delete', icon: 'icofont-ui-delete'}
+        {name: '执行', key: 'run', icon: 'icofont-play-alt-1'},
+        {name: '删除', key: 'delete', icon: 'icofont-ui-delete'},
     ];
 
     const menuClick = ({detail}) => {
-        showConfirm(`确认删除[${nowItem.input}]吗?`).then(({response}) => {
-            if (response === 1) {
-                history.delete(nowItem._id).then(() => getHistory(name));
-            }
-        })
+        if (detail.key == 'run') {
+            writeTerminal(id || 'base', nowItem.input + '\r');
+        } else {
+            showConfirm(`确认删除[${nowItem.input}]吗?`).then(({response}) => {
+                if (response === 1) {
+                    history.delete(nowItem._id).then(() => getHistory(name));
+                }
+            });
+        }
     }
 
     const onRightClick = (d, e) => {
@@ -50,7 +56,6 @@
     }
 
     .history-panel > .title {
-        display: none;
         height: 35px;
         display: flex;
         box-sizing: border-box;
@@ -135,7 +140,7 @@
             <div class="icofont-refresh" on:click={() => getHistory(name)}></div>
         </div>
     </div>
-    <div class="content" style="background-color: {theme.colors['panel.background']};">
+    <div class="content" style="background-color: {theme.colors['input.background']};">
         {#each data as d}
             <div class="list" on:click={() => click(d)} title={d.input}
                  on:contextmenu|preventDefault={(e) => onRightClick(d,e)}>

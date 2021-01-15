@@ -54,7 +54,7 @@ class ConfigData {
                 key: "terminal",
                 name: "git",
                 id: 'git',
-                path: 'C:/Program Files/Git/bin/bash.exe',
+                path: git,
                 icon: "./assets/image/git.svg",
             });
         }
@@ -65,8 +65,19 @@ class ConfigData {
                 key: "terminal",
                 name: "wsl",
                 id: 'wsl',
-                path: 'C:/Windows/System32/wsl.exe',
+                path: wsl,
                 icon: "./assets/image/ubuntu.svg",
+            });
+        }
+        const powerShell = 'C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe';
+        if (fs.existsSync(powerShell)) {
+            folder.push({
+                type: "file",
+                key: "terminal",
+                name: "powerShell",
+                id: 'powerShell',
+                path: powerShell,
+                icon: "./assets/image/PowerShell.svg",
             });
         }
         return [
@@ -81,7 +92,7 @@ class ConfigData {
                         type: "file",
                         key: "terminal",
                         name: "cmd",
-                        id: 'cmd',
+                        id: 'base',
                         icon: "./assets/image/terminal.svg",
                     },
                     ...folder,
