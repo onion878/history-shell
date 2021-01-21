@@ -1,11 +1,22 @@
-let appData = null;
+let appData = null, appPath = null;
+const path = require('path');
+const app = require('app-root-path');
 
 module.exports = {
     getDataPath() {
         if (appData == null) {
             appData = (process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")) + '/history-shell';
         }
+        if (appPath == null) {
+            appPath = app.path + "";
+        }
         return appData;
+    },
+    getAppPath() {
+        if (path.basename(appPath) == 'app.asar') {
+            return path.dirname(appPath).replace(/\\/g, '/');
+        }
+        return appPath.replace(/\\/g, '/');
     },
     toJSON(data) {
         const v = {};

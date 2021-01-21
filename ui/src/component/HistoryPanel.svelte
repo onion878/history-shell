@@ -24,12 +24,15 @@
     let menuX, menuY, menuShow = false, nowItem;
     let menu = [
         {name: '执行', key: 'run', icon: 'icofont-play-alt-1'},
+        {name: '复制', key: 'copy', icon: 'icofont-ui-copy'},
         {name: '删除', key: 'delete', icon: 'icofont-ui-delete'},
     ];
 
     const menuClick = ({detail}) => {
         if (detail.key == 'run') {
             writeTerminal(id || 'base', nowItem.input + '\r');
+        } else if (detail.key == 'copy') {
+            navigator.clipboard.writeText(nowItem.input);
         } else {
             showConfirm(`确认删除[${nowItem.input}]吗?`).then(({response}) => {
                 if (response === 1) {

@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, dialog} = require('electron');
+const {app, BrowserWindow, dialog, Menu} = require('electron');
 const path = require('path');
 app.showExitPrompt = true;
 app.allowRendererProcessReuse = false;
@@ -28,7 +28,56 @@ function createWindow() {
             }
         }
         mainWindow.show();
-    })
+    });
+
+    // if (process.platform === 'darwin') {
+    //     const menuItems = [
+    //         {
+    //             label: '系统',
+    //             submenu: [
+    //                 {
+    //                     label: '控制台',
+    //                     click() {
+    //                         mainWindow.webContents.openDevTools();
+    //                     }
+    //                 },
+    //                 {type: 'separator'},
+    //                 {
+    //                     label: '重新启动',
+    //                     click() {
+    //                         dialog.showMessageBox(mainWindow, {
+    //                             type: 'question',
+    //                             buttons: ['否', '是'],
+    //                             title: '提示',
+    //                             defaultId: 1,
+    //                             message: '是否重新启动?',
+    //                             noLink: true
+    //                         }).then(({response}) => {
+    //                             if (response === 1) {
+    //                                 app.relaunch();
+    //                                 app.exit(0);
+    //                             }
+    //                         });
+    //                     }
+    //                 }
+    //             ]
+    //         },
+    //         {
+    //             label: "编辑",
+    //             submenu: [
+    //                 {label: "撤销", accelerator: "CmdOrCtrl+Z", selector: "undo:"},
+    //                 {label: "重做", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:"},
+    //                 {type: "separator"},
+    //                 {label: "剪切", accelerator: "CmdOrCtrl+X", selector: "cut:"},
+    //                 {label: "拷贝", accelerator: "CmdOrCtrl+C", selector: "copy:"},
+    //                 {label: "粘贴", accelerator: "CmdOrCtrl+V", selector: "paste:"},
+    //                 {label: "选择所有", accelerator: "CmdOrCtrl+A", selector: "selectAll:"}
+    //             ]
+    //         }
+    //     ];
+    //     const menu = Menu.buildFromTemplate(menuItems);
+    //     Menu.setApplicationMenu(menu);
+    // }
 
     // and load the index.html of the app.
     mainWindow.loadFile('index.html').then(r => {
@@ -60,6 +109,7 @@ function createWindow() {
                             maximal: maximal
                         }).then(() => {
                             mainWindow.close();
+                            process.exit(0);
                         });
                     } else {
                         setting.setWin({
@@ -70,6 +120,7 @@ function createWindow() {
                             maximal: maximal
                         }).then(() => {
                             mainWindow.close();
+                            process.exit(0);
                         });
                     }
                 }

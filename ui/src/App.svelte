@@ -1,11 +1,6 @@
 <script lang="ts">
     import {changeAllTheme, writeTerminal} from "./component/utils";
     declare function require(arg: string);
-
-    export let name: string;
-    export let theme;
-    export let quickShow = "none";
-    let mainLoading = "block";
     import TitleBar from "./component/TitleBar.svelte";
     import StatusBar from "./component/StatusBar.svelte";
     import ActivityBar from "./component/ActivityBar.svelte";
@@ -14,20 +9,26 @@
     import QuickInput from "./component/QuickInput.svelte";
     import TabContent from "./component/TabContent.svelte";
     import HistoryPanel from "./component/HistoryPanel.svelte";
+    import hotkeys from "hotkeys-js";
+
+    export let name: string;
+    export let theme;
+    let quickShow = false;
+    let mainLoading = "block";
     let index = 0;
     let msg = "该项目进行中...";
     const toggleConsole = () => {
         msg = msg + "Onion ";
-        changeTheme('night');
+        changeTheme();
     };
     const toggleTerminal = () => {
         msg = msg + "Onion ==";
-        changeTheme('light');
+        changeTheme();
     };
 
-    const changeTheme = (t) => {
+    const changeTheme = () => {
         index++;
-        const n = require('./app/utils/theme').getTheme(t);
+        const n = require('./app/utils/theme').getTheme(index);
         const d = changeAllTheme(index);
         if(d) {
             n.colors.termBackground = d.background;
@@ -105,6 +106,10 @@
     const addWrite = ({detail}) => {
         writeTerminal(tabs[nowTab].id, detail.input);
     }
+    hotkeys('f1', function(event){
+        event.preventDefault();
+        quickShow = !quickShow;
+    });
 </script>
 
 <style>

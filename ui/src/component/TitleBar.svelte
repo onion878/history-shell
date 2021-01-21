@@ -151,7 +151,7 @@
         margin-left: -8px;
         position: absolute;
         min-width: 100px;
-        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+        box-shadow: 0px 1px 2px 0px var(--shadow);
         z-index: 3;
         background: var(--title-menu-background);
     }
@@ -247,7 +247,7 @@
                     on:click={toggleSystem}>
                 系统
             </div>
-            <div class="menu-content" bind:this={system} style="display:{systemFlag}">
+            <div class="menu-content" bind:this={system} style="display:{systemFlag};box-shadow: {theme.colors['widget.shadow']}">
                 <div>设置</div>
                 <div on:click={() => systemClick('theme')}>切换主题</div>
                 <div on:click={() => systemClick('console')}>控制台</div>

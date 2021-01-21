@@ -48,13 +48,6 @@ class BaseService {
                 color: c.primary.underline
             }
         ];
-        // const theme = themes[i];
-        // const d = {
-        //     cursor: theme.brightBlack,
-        //     selection: theme.brightWhite,
-        //     ...theme
-        // };
-        // this.term?.setOption('theme', d);
     }
 
     changeTheme(index) {
@@ -104,14 +97,6 @@ class BaseService {
                 require("open")(uri);
             }
         }));
-        that.term.element.addEventListener('contextmenu', (e) => {
-            if (that.term.hasSelection()) {
-                document.execCommand('copy');
-                that.term.select(0, 0, 0);
-            } else {
-                this.copyToXterm();
-            }
-        });
         this.term.onKey(({domEvent}) => {
             that.key = domEvent;
             if (domEvent.ctrlKey) {
@@ -234,6 +219,10 @@ class BaseService {
                 this.term.clearSelection();
             }
         }
+    }
+
+    clearSelection() {
+        this.term.clearSelection();
     }
 
     changeColor(shell) {

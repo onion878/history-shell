@@ -75,8 +75,19 @@ class ShellService extends BaseService {
         this.term.reset()
     }
 
+    cdTargetFolder(folder) {
+        const that = this;
+        that.stream.write("\x03", function () {
+            that.write(`cd ${folder}\r`);
+        });
+    }
+
     clearTerm() {
-        this.term.clear();
+        this.recordFlag = false;
+        const that = this;
+        that.stream.write("\x03", function () {
+            that.write('clear\r');
+        });
     }
 
     writeTerm(shell) {

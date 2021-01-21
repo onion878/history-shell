@@ -6,7 +6,7 @@ const app = new App({
     target: document.body,
     props: {
         name: 'world',
-        theme: require('./app/utils/theme').getTheme()
+        theme: require('./app/utils/theme').getTheme(0)
     }
 });
 

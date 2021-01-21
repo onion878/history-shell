@@ -42,7 +42,6 @@
         }, true);
 
         document.addEventListener('mousemove', function (e) {
-            e.preventDefault();
             if (isDown) {
                 const x = (e.clientX + offset[0]);
                 const y = (e.clientY + offset[1]);

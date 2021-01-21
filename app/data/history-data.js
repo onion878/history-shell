@@ -18,7 +18,7 @@ class HistoryData {
             uniqueId: input.replace(/\s+/g, "")
         };
         return new Promise((resolve) => {
-            that.db.findOne({uniqueId: data['uniqueId']}, function (err, doc) {
+            that.db.findOne({uniqueId: data['uniqueId'], name: name}, function (err, doc) {
                 if (doc == null) {
                     data.sort = new Date().getTime();
                     that.db.insert(data, function (err) {

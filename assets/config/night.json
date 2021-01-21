@@ -1,25 +1,25 @@
 {
-	"name": "night",
-	"tokenColors": [],
-	"colors": {
-		"foreground": "black",
-		"background": "white",
-		"focus": "rgb(255,255,255,0.1)",
-		"focusBorder": "rgb(14,99,156,0.8)",
-		"progressBar.background": "rgb(14, 112, 192)",
-		"widget.shadow": "rgb(0, 0, 0)",
-		"titleBar.activeBackground": "#3C3C3C",
-		"dropdown.background": "#252526",
-		"statusBar.background": "#007ACC",
-		"statusBar.foreground": "white",
-		"activityBar.background": "#333333",
-		"activityBar.foreground": "#FFFFFF",
-		"activityBar.inactiveForeground": "rgb(255, 255, 255, 0.6)",
-		"sideBar.background": "#252526",
-		"sideBar.foreground": "#CCCCCC",
-		"panel.background": "rgb(128, 128, 128, 0.2)",
-		"editorWidget.background": "rgb(37, 37, 38)",
-		"input.background": "rgb(60, 60, 60)",
-		"input.foreground": "rgb(204, 204, 204)"
-	}
+  "name": "night",
+  "tokenColors": [],
+  "colors": {
+    "foreground": "black",
+    "background": "white",
+    "focus": "rgb(255,255,255,0.1)",
+    "focusBorder": "rgb(14,99,156,0.8)",
+    "progressBar.background": "rgb(14, 112, 192)",
+    "widget.shadow": "rgb(0, 0, 0)",
+    "titleBar.activeBackground": "#3C3C3C",
+    "dropdown.background": "#252526",
+    "statusBar.background": "#007ACC",
+    "statusBar.foreground": "white",
+    "activityBar.background": "#333333",
+    "activityBar.foreground": "#FFFFFF",
+    "activityBar.inactiveForeground": "rgb(255, 255, 255, 0.6)",
+    "sideBar.background": "#252526",
+    "sideBar.foreground": "#CCCCCC",
+    "panel.background": "rgb(128, 128, 128, 0.2)",
+    "editorWidget.background": "rgb(37, 37, 38)",
+    "input.background": "rgb(60, 60, 60)",
+    "input.foreground": "rgb(204, 204, 204)"
+  }
 }

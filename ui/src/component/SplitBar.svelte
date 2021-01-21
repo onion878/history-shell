@@ -22,7 +22,6 @@
         }, true);
 
         container.addEventListener('mousemove', function (e) {
-            e.preventDefault();
             if (!isResizing) {
                 return;
             }
@@ -60,7 +59,7 @@
     }
 
     .container > .left_panel > .drag {
-        width: 8px;
+        width: 2px;
         height: 100%;
         cursor: w-resize;
     }
@@ -71,7 +70,7 @@
         <div style="flex: 1 1 auto;">
             <slot name="left"/>
         </div>
-        <div class="drag" bind:this={handle} style="flex: 0 0 4px;background-color: {theme.colors['termBackground']}"/>
+        <div class="drag" bind:this={handle} style="background-color: {theme.colors['termBackground']}"/>
     </div>
     <div class="right_panel" bind:this={right} style="flex: {center == 'left'? '0 0 ' + width: '1 1 auto'};">
         <slot name="right"/>

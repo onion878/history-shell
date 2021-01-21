@@ -85,7 +85,7 @@ class ConfigData {
                 type: "folder",
                 key: "terminal",
                 name: "本地终端",
-                expanded: false,
+                expanded: true,
                 icon: "./assets/image/local.svg",
                 children: [
                     {

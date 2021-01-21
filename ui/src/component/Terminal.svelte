@@ -1,7 +1,8 @@
 <script lang="ts">
     import {watchResize} from "svelte-watch-resize";
     import {onMount} from "svelte";
-    import {addTerminal} from "./utils";
+    import {addTerminal, isFile, isWin, matchLocalPath, openFile, openFolder} from "./utils";
+    import ContextMenu from "./ContextMenu.svelte";
 
     const TerminalService = require('./app/cmd/terminal-service');
     const terminal = new TerminalService();
@@ -37,6 +38,78 @@
     const fit = () => {
         terminal.fitTerm();
     }
+    let menuX, menuY, menuShow = false, menu: any[] = [], now = null;
+    const all: any[] = [
+        {name: '复制', key: 'copy', icon: 'icofont-ui-copy'},
+        {name: '粘贴', key: 'paste', icon: 'icofont-copy-invert'},
+        {name: '清空屏幕', key: 'clear', icon: 'icofont-brush'},
+    ];
+
+    if (isWin()) {
+        all.push({type: 'separator'});
+        all.push({name: '管理员运行', key: 'super', icon: 'icofont-skull-danger'});
+    }
+
+    const onRightClick = (e) => {
+        menuX = e.x;
+        menuY = e.y;
+        now = terminal.term.getSelection().replace(/\n/g, '').trim();
+        if (now.length > 0) {
+            if (matchLocalPath(now)) {
+                menu = [{
+                    name: '文件管理器中打开',
+                    key: 'openInFolder',
+                    icon: 'icofont-folder-open'
+                }, {type: 'separator'}].concat(all);
+                if (isFile(now)) {
+                    menu = [{name: '打开文件', key: 'open', icon: 'icofont-touch'}].concat(menu);
+                } else {
+                    menu = [{name: '进入目录', key: 'intoFolder', icon: 'icofont-hand-right'}].concat(menu);
+                }
+            } else {
+                menu = all;
+            }
+        } else {
+            menu = all;
+        }
+        menuShow = !menuShow;
+    }
+
+    const menuClick = ({detail}) => {
+        switch (detail.key) {
+            case "openInFolder": {
+                openFolder(now);
+                break;
+            }
+            case "open": {
+                openFile(now);
+                break;
+            }
+            case "intoFolder": {
+                terminal.cdTargetFolder(now);
+                break;
+            }
+            case "copy": {
+                navigator.clipboard.writeText(now);
+                terminal.clearSelection();
+                break;
+            }
+            case "paste": {
+                terminal.copyToXterm();
+                break;
+            }
+            case "clear": {
+                terminal.clearTerm();
+                break;
+            }
+            case "super": {
+                terminal.setSuperUser();
+                break;
+            }
+            default:
+                this.isWrite = true;
+        }
+    }
 
     const dropHandler = (ev) => {
         // Prevent default behavior (Prevent file from being opened)
@@ -63,4 +136,8 @@
     }
 </style>
 
-<div class="terminal" use:watchResize={fit} bind:this={dom} style="background-color: {theme.colors['termBackground']}"></div>
+<ContextMenu bind:theme={theme} bind:data={menu} on:click={menuClick} bind:show={menuShow}
+             bind:x={menuX} bind:y={menuY}
+             width="145"/>
+<div class="terminal" on:contextmenu|preventDefault={(e) => onRightClick(e)} use:watchResize={fit} bind:this={dom}
+     style="background-color: {theme.colors['termBackground']}"></div>

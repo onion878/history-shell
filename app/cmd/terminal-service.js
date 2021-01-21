@@ -3,6 +3,8 @@ const os = require('os');
 const pty = require('node-pty');
 const Terminal = require('xterm').Terminal;
 const FitAddon = require('xterm-addon-fit').FitAddon;
+const help = require('../utils/help');
+const Path = require('path');
 
 class TerminalService extends BaseService {
     constructor() {
@@ -10,6 +12,7 @@ class TerminalService extends BaseService {
         this.cmdFlag = false;
         this.nowPty = null;
         this.initMsg = "";
+        this.sudo = null;
         this.fitAddon = new FitAddon();
     }
 
@@ -23,7 +26,7 @@ class TerminalService extends BaseService {
             } else {
                 that.name = 'base';
             }
-            if (terminal.indexOf('cmd.exe') > -1) {
+            if (os.platform() == 'win32' && terminal.indexOf('cmd.exe') > -1) {
                 this.cmdFlag = true;
             }
             if (this.nowPty == null) {
@@ -39,7 +42,6 @@ class TerminalService extends BaseService {
         const that = this;
         try {
             const ptyProcess = pty.spawn(userBash, [], {
-                name: 'terminal',
                 cols: 180,
                 rows: 30,
                 cwd: os.homedir(),
@@ -47,6 +49,9 @@ class TerminalService extends BaseService {
             });
             that.nowPty = ptyProcess;
             that.nowPty.onData(function (data) {
+                if (that.sudo != null && data.indexOf(that.sudo) > -1) {
+                    data = data.replace(that.sudo, '获取管理员权限中...');
+                }
                 that.writeToXterm(data);
             });
         } catch (e) {
@@ -81,11 +86,17 @@ class TerminalService extends BaseService {
     }
 
     clearTerm() {
-        this.term.clear();
+        this.recordFlag = false;
+        this.cancelPty();
+        if (this.cmdFlag) {
+            this.write('cls\r');
+        } else {
+            this.write('clear\r');
+        }
     }
 
     cancelPty() {
-        this.nowPty.write("\x03\r");
+        this.nowPty.write("\x03");
     }
 
     write(shell) {
@@ -93,6 +104,27 @@ class TerminalService extends BaseService {
             this.nowPty.write(shell);
             this.writeAfter(shell);
         }
+    }
+
+    cdTargetFolder(folder) {
+        if (this.nowPty == null) return;
+        const platform = process.platform;
+        this.cancelPty();
+        if (this.cmdFlag && platform == 'win32') {
+            this.nowPty.write(`cd /d ${folder}\r`);
+        } else {
+            if (platform == 'darwin') {
+                this.nowPty.write(`cd ${folder.replace(/ /g, '\\ ')}\r`);
+            } else {
+                this.nowPty.write(`cd ${folder}\r`);
+            }
+        }
+    }
+
+    setSuperUser() {
+        this.sudo = (help.getAppPath() + '/plugins/gsudo.exe').replace(/\\/g, '/');
+        this.cancelPty();
+        this.nowPty?.write(this.sudo + '\r');
     }
 
     destroy() {

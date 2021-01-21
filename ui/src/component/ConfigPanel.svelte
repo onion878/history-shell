@@ -109,6 +109,7 @@
             if (nowItem.type == 'file') {
                 menu = [
                     {name: '新建窗口', key: 'open', icon: 'icofont-interface'},
+                    {name: '复制IP', key: 'copy-post', icon: 'icofont-copy-invert'},
                     {type: 'separator'},
                     {name: '复制', key: 'copy', icon: 'icofont-ui-copy'},
                     {name: '编辑', key: 'edit', icon: 'icofont-ui-edit'},
@@ -126,7 +127,6 @@
             }
             menuShow = !menuShow;
         }
-        console.log(nowItem);
     }
     const getListId = (item) => {
         let list = [];
@@ -145,6 +145,8 @@
         } else if (detail.key == 'config') {
             parentId = nowItem.id;
             addSSHFlag = !addSSHFlag;
+        } else if (detail.key == 'copy-post') {
+            navigator.clipboard.writeText(nowItem.host);
         } else if (detail.key == 'copy') {
             parentId = nowItem.parentId;
             if (nowItem.type == 'folder') {
