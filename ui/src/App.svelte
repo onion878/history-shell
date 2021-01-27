@@ -1,6 +1,8 @@
 <script lang="ts">
-    import {changeAllTheme, writeTerminal} from "./component/utils";
+    import {changeAllTheme, isDarwin, setNowTerminal, writeTerminal} from "./component/utils";
+
     declare function require(arg: string);
+
     import TitleBar from "./component/TitleBar.svelte";
     import StatusBar from "./component/StatusBar.svelte";
     import ActivityBar from "./component/ActivityBar.svelte";
@@ -10,35 +12,31 @@
     import TabContent from "./component/TabContent.svelte";
     import HistoryPanel from "./component/HistoryPanel.svelte";
     import hotkeys from "hotkeys-js";
+    import ExplorePanel from "./component/ExplorePanel.svelte";
 
     export let name: string;
     export let theme;
+    let darwinFlag = isDarwin();
     let quickShow = false;
     let mainLoading = "block";
     let index = 0;
-    let msg = "该项目进行中...";
-    const toggleConsole = () => {
-        msg = msg + "Onion ";
-        changeTheme();
-    };
-    const toggleTerminal = () => {
-        msg = msg + "Onion ==";
-        changeTheme();
-    };
+    let msg = "该项目进行中...", statusList = [];
+    let panelType: 'config' | 'explore' = 'config';
 
     const changeTheme = () => {
         index++;
         const n = require('./app/utils/theme').getTheme(index);
         const d = changeAllTheme(index);
-        if(d) {
+        if (d) {
             n.colors.termBackground = d.background;
         }
         theme = n;
     }
 
-    console.log(JSON.stringify(theme.colors));
-    let tabs = [], nowTab = 0;
-    let historyId,historyName;
+    console.log(theme);
+
+    let tabs = [], nowTab = 0, showTab;
+    let historyId, historyName;
     const setHistoryName = (tab) => {
         if (tab == null) {
             historyName = 'null';
@@ -52,6 +50,7 @@
             historyName = tab.path;
             historyId = tab.id;
         }
+        showTab = tab;
     }
     const addTab = (tab) => {
         if (tab.id == null) {
@@ -80,6 +79,7 @@
             } else {
                 nowTab = now;
             }
+            setNowTerminal(tabs[nowTab].id);
         }, 1);
     }
     const changeTab = ({detail}) => {
@@ -101,15 +101,19 @@
         }
     }
     const changeHistory = ({detail}) => {
+        setNowTerminal(detail.id);
         setHistoryName(detail);
     }
     const addWrite = ({detail}) => {
         writeTerminal(tabs[nowTab].id, detail.input);
     }
-    hotkeys('f1', function(event){
+    hotkeys('f1', function (event) {
         event.preventDefault();
         quickShow = !quickShow;
     });
+    const showStatusBar = ({detail}) => {
+        statusList = detail;
+    }
 </script>
 
 <style>
@@ -118,12 +122,12 @@
         height: 100%;
         background: var(--background);
         color: var(--color);
+        user-select: none;
     }
 
     .main > .content {
         --width: calc(100% - 50px);
         width: var(--width);
-        top: 30px;
         bottom: 22px;
         left: 50px;
         position: absolute;
@@ -186,22 +190,30 @@
 </svelte:head>
 <div class="main" style="--background: {theme.colors.foreground}; --color: {theme.colors['background']};
   --focus:{theme.colors['focus']}; --focus-border: {theme.colors['focusBorder']};
+  --scroll:{theme.colors['scrollbarSlider.background']}; --focus-scroll: {theme.colors['scrollbarSlider.hoverBackground']};
   --shadow: {theme.colors['widget.shadow']}">
-    <TitleBar {theme} bind:msg/>
+    {#if !darwinFlag}
+        <TitleBar {theme} bind:msg/>
+    {/if}
     <div class="monaco-progress-container" style="display: none;">
         <div class="progress-bit"
              style="background-color: {theme.colors['progressBar.background']};opacity:1;display:{mainLoading}"/>
     </div>
-    <ActivityBar {theme} bind:msg/>
-    <div class="content">
+    <ActivityBar {theme} bind:panelType/>
+    <div class="content" style="top: {darwinFlag?'0':'30'}px">
         <SplitBar {theme}>
             <div slot="left" style="width: 100%;height: 100%;">
-                <ConfigPanel {theme} on:addSSH={treeClick} on:treeClick={treeClick}/>
+                {#if panelType == 'config'}
+                    <ConfigPanel {theme} on:addSSH={treeClick} on:treeClick={treeClick}/>
+                {:else}
+                    <ExplorePanel {theme} bind:showTab/>
+                {/if}
             </div>
             <div slot="right" style="height: 100%;">
                 <SplitBar {theme} center="left" width="250px">
                     <div slot="left" style="width: 100%;height: 100%;">
-                        <TabContent {theme} bind:msg {tabs} {nowTab} on:changeTab={changeTab}
+                        <TabContent {theme} bind:msg {tabs} bind:nowTab on:changeTab={changeTab}
+                                    on:showStatusBar={showStatusBar}
                                     on:change={changeHistory}/>
                     </div>
                     <div slot="right" style="height: 100%;">
@@ -211,10 +223,6 @@
             </div>
         </SplitBar>
     </div>
-    <StatusBar
-            {theme}
-            bind:msg
-            on:toggleConsole={toggleConsole}
-            on:toggleTerminal={toggleTerminal}/>
+    <StatusBar {theme} {msg} {statusList}/>
     <QuickInput {theme} bind:msg bind:show={quickShow}/>
 </div>

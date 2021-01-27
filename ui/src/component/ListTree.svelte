@@ -3,7 +3,6 @@
 
     export let theme, index = 0, now, data = [];
     export let dispatch = createEventDispatcher();
-
     const itemClick = (item) => {
         now = item.id;
         dispatch('click', item);
@@ -11,6 +10,10 @@
 
     const onRightClick = (item, e) => {
         dispatch('rightClick', {data: item, x: e.clientX, y: e.clientY});
+    }
+
+    const toggle = (d) => {
+        dispatch('toggle', {expanded: d.expanded, data: d});
     }
 </script>
 
@@ -55,20 +58,26 @@
     .tree-title > .tree-expanded.expanded:before {
         content: '\eab2';
     }
+
+    .tree-title > .tree-text {
+        white-space: nowrap;
+    }
 </style>
 {#each data as d}
     <div class="tree">
-        <div class="tree-title" style="background-color: {now == d.id?theme.colors['titleBar.activeBackground']:''}"
+        <div class="tree-title"
+             style="background-color: {(now && now == d.id)?theme.colors['titleBar.activeBackground']:''}"
              on:click={() => itemClick(d)} on:contextmenu|preventDefault={(e) => onRightClick(d,e)}>
             <div style="width: {index*12}px"></div>
-            <div class="tree-expanded" on:click={() => d.expanded = !d.expanded}
+            <div class="tree-expanded" on:click={() => {d.expanded = !d.expanded;toggle(d)}}
                  class:expanded={d.type === 'folder' && d.expanded}
                  class:collapse={d.type === 'folder' && !d.expanded}></div>
             <div class="tree-icon" style="background-image: url({d.icon})"></div>
             <div class="tree-text">{d.name}</div>
         </div>
         {#if d.type === 'folder' && d.expanded}
-            <svelte:self bind:data={d.children} index={index+1} bind:now={now} bind:theme={theme} bind:dispatch={dispatch}/>
+            <svelte:self bind:data={d.children} index={index+1} bind:now={now} bind:theme={theme}
+                         bind:dispatch={dispatch}/>
         {/if}
     </div>
 {/each}

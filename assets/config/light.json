@@ -20,6 +20,8 @@
     "panel.background": "rgb(128, 128, 128, 0.2)",
     "editorWidget.background": "rgb(243, 243, 243)",
     "input.background": "rgb(255, 255, 255)",
-    "input.foreground": "rgb(97, 97, 97)"
+    "input.foreground": "rgb(97, 97, 97)",
+    "scrollbarSlider.background": "rgb(0,0,0,0.1)",
+    "scrollbarSlider.hoverBackground": "rgb(125, 126, 39, 0.6)"
   }
 }

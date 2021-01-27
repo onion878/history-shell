@@ -24,6 +24,8 @@ export function validateData(data, ignore) {
     return index == 0;
 }
 
+let nowTerminalId = null;
+
 const allTerminal = {};
 
 export function addTerminal(id, terminal) {
@@ -33,6 +35,14 @@ export function addTerminal(id, terminal) {
 export function writeTerminal(id, shell) {
     allTerminal[id].key = {key: 'write'};
     allTerminal[id].writeToServer(shell);
+}
+
+export function setNowTerminal(id) {
+    nowTerminalId = id;
+}
+
+export function getNowTerminal() {
+    return allTerminal[nowTerminalId];
 }
 
 export function changeAllTheme(index) {
@@ -49,6 +59,10 @@ export function closeTerminal(id) {
 
 export function isWin() {
     return process.platform == 'win32';
+}
+
+export function isDarwin() {
+    return process.platform === 'darwin';
 }
 
 export function matchLocalPath(path: string) {
@@ -81,4 +95,55 @@ export function openFolder(path: string) {
 
 export function openFile(path: string) {
     shell.openPath(Path.resolve(path));
+}
+
+export function getFileInfo(path: string) {
+    return fs.lstatSync(path);
+}
+
+export function getNow(date: Date = new Date()) {
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+    let hours = date.getHours();
+    let min = date.getMinutes();
+    let sec = date.getSeconds();
+
+    let code = date.getFullYear() + '-' + toForMatter(month) + '-' +
+        toForMatter(day) + ' ' + toForMatter(hours) + ':' + toForMatter(min)
+        + ':' + toForMatter(sec);
+
+    function toForMatter(num) {
+        if (num < 10) {
+            num = "0" + num;
+        }
+        return num + "";
+    }
+
+    return code;
+}
+
+export function getNowTime(date: Date = new Date()) {
+    let hours = date.getHours();
+    let min = date.getMinutes();
+    let sec = date.getSeconds();
+
+    let code = toForMatter(hours) + ':' + toForMatter(min) + ':' + toForMatter(sec);
+
+    function toForMatter(num) {
+        if (num < 10) {
+            num = "0" + num;
+        }
+        return num + "";
+    }
+
+    return code;
+}
+
+export function bytesToSize(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }

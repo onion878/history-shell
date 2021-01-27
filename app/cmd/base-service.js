@@ -166,11 +166,13 @@ class BaseService {
                     })
                 }
                 that.write(r);
+                this.runAfter();
             } else {
                 that.showConfirm("您复制了多行会直接执行的代码,将在按回车前不会记录该历史,是否继续").then(({response}) => {
                     if (response === 1) {
                         that.recordFlag = false;
                         that.write(r);
+                        this.runAfter();
                     }
                 });
             }
@@ -200,6 +202,7 @@ class BaseService {
     recordHistory(flag) {
         if (this.recordFlag === false) return;
         if (flag) {
+            this.runAfter();
             this.key = null;
             if (this.history.trim().length == 0) return;
             const row = this.term.buffer.active.baseY + this.term.rows;
@@ -241,6 +244,10 @@ class BaseService {
 
     writeAfter(shell) {
         this.initFlag = true;
+    }
+
+    runAfter() {
+
     }
 }
 

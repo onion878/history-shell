@@ -58,6 +58,11 @@
         display: flex;
     }
 
+    .container > .left_panel > .left_content {
+        flex: 1 1 auto;
+        width: calc(100% - 2px);
+    }
+
     .container > .left_panel > .drag {
         width: 2px;
         height: 100%;
@@ -66,13 +71,15 @@
 </style>
 
 <div class="container" bind:this={container}>
-    <div class="left_panel" bind:this={left} style="flex: {center == 'right'? '0 0 ' + width: '1 1 auto'};">
-        <div style="flex: 1 1 auto;">
+    <div class="left_panel" bind:this={left}
+         style="flex: {center == 'right'? '0 0 ' + width: '1 1 auto'};width: {center == 'right'? width: 'auto'}">
+        <div class="left_content">
             <slot name="left"/>
         </div>
         <div class="drag" bind:this={handle} style="background-color: {theme.colors['termBackground']}"/>
     </div>
-    <div class="right_panel" bind:this={right} style="flex: {center == 'left'? '0 0 ' + width: '1 1 auto'};">
+    <div class="right_panel" bind:this={right}
+         style="flex: {center == 'left'? '0 0 ' + width: '1 1 auto'};width: {center == 'left'? width: 'auto'}">
         <slot name="right"/>
     </div>
 </div>

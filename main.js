@@ -11,7 +11,7 @@ function createWindow() {
         width: 800,
         height: 600,
         show: false,
-        frame: false,
+        frame: process.platform === 'darwin',
         enableLargerThanScreen: true,
         webPreferences: {
             nodeIntegration: true,
@@ -30,54 +30,84 @@ function createWindow() {
         mainWindow.show();
     });
 
-    // if (process.platform === 'darwin') {
-    //     const menuItems = [
-    //         {
-    //             label: '系统',
-    //             submenu: [
-    //                 {
-    //                     label: '控制台',
-    //                     click() {
-    //                         mainWindow.webContents.openDevTools();
-    //                     }
-    //                 },
-    //                 {type: 'separator'},
-    //                 {
-    //                     label: '重新启动',
-    //                     click() {
-    //                         dialog.showMessageBox(mainWindow, {
-    //                             type: 'question',
-    //                             buttons: ['否', '是'],
-    //                             title: '提示',
-    //                             defaultId: 1,
-    //                             message: '是否重新启动?',
-    //                             noLink: true
-    //                         }).then(({response}) => {
-    //                             if (response === 1) {
-    //                                 app.relaunch();
-    //                                 app.exit(0);
-    //                             }
-    //                         });
-    //                     }
-    //                 }
-    //             ]
-    //         },
-    //         {
-    //             label: "编辑",
-    //             submenu: [
-    //                 {label: "撤销", accelerator: "CmdOrCtrl+Z", selector: "undo:"},
-    //                 {label: "重做", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:"},
-    //                 {type: "separator"},
-    //                 {label: "剪切", accelerator: "CmdOrCtrl+X", selector: "cut:"},
-    //                 {label: "拷贝", accelerator: "CmdOrCtrl+C", selector: "copy:"},
-    //                 {label: "粘贴", accelerator: "CmdOrCtrl+V", selector: "paste:"},
-    //                 {label: "选择所有", accelerator: "CmdOrCtrl+A", selector: "selectAll:"}
-    //             ]
-    //         }
-    //     ];
-    //     const menu = Menu.buildFromTemplate(menuItems);
-    //     Menu.setApplicationMenu(menu);
-    // }
+    if (process.platform === 'darwin') {
+        const menuItems = [
+            {
+                label: '系统',
+                submenu: [
+                    {
+                        label: '控制台',
+                        role: 'toggleDevTools'
+                    },
+                    {
+                        label: '刷新',
+                        role: 'reload'
+                    },
+                    {type: 'separator'},
+                    {
+                        label: '退出',
+                        role: 'quit'
+                    },
+                    {
+                        label: '重新启动',
+                        click() {
+                            dialog.showMessageBox(mainWindow, {
+                                type: 'question',
+                                buttons: ['否', '是'],
+                                title: '提示',
+                                defaultId: 1,
+                                message: '是否重新启动?',
+                                noLink: true
+                            }).then(({response}) => {
+                                if (response === 1) {
+                                    app.relaunch();
+                                    app.exit(0);
+                                }
+                            });
+                        }
+                    }
+                ]
+            },
+            {
+                label: '视图',
+                submenu: [
+                    {
+                        label: '缩小',
+                        role: 'zoomin',
+                    },
+                    {
+                        label: '放大',
+                        role: 'zoomout',
+                    },
+                    {
+                        label: '重置缩放',
+                        role: 'resetzoom',
+                    },
+                    {
+                        type: 'separator',
+                    },
+                    {
+                        label: '全屏',
+                        role: 'togglefullscreen',
+                    },
+                ],
+            },
+            {
+                label: "编辑",
+                submenu: [
+                    {label: "撤销", accelerator: "CmdOrCtrl+Z", selector: "undo:"},
+                    {label: "重做", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:"},
+                    {type: "separator"},
+                    {label: "剪切", accelerator: "CmdOrCtrl+X", selector: "cut:"},
+                    {label: "拷贝", accelerator: "CmdOrCtrl+C", selector: "copy:"},
+                    {label: "粘贴", accelerator: "CmdOrCtrl+V", selector: "paste:"},
+                    {label: "选择所有", accelerator: "CmdOrCtrl+A", selector: "selectAll:"}
+                ]
+            }
+        ];
+        const menu = Menu.buildFromTemplate(menuItems);
+        Menu.setApplicationMenu(menu);
+    }
 
     // and load the index.html of the app.
     mainWindow.loadFile('index.html').then(r => {

@@ -27,6 +27,7 @@
     const getAllTree = () => {
         config.getAllData().then(data => {
             tree = data;
+            treeClick({detail: data[0].children[0]});
         });
     };
     getAllTree();
@@ -180,7 +181,6 @@
     }
     // return list tree click func
     const treeClick = ({detail}) => {
-        console.log(detail);
         dispatch('treeClick', detail);
     }
 </script>

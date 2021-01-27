@@ -6,19 +6,20 @@
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder --x64",
-    "postinstall": "node prebuild.js && install-app-deps"
+    "postinstall": "node prebuild.js && electron-builder install-app-deps",
+    "rebuild": "node prebuild.js && electron-rebuild --arch=arm64 --force --version=11.2.0"
   },
   "author": {
     "name": "Onion",
     "email": "a2214839296a@gmail.com"
   },
-  "homepage": "https://github.com/onion878/GenerateTool",
+  "homepage": "https://github.com/onion878/history-shell",
   "license": "CC0-1.0",
   "url": "https://github.com/onion878",
   "build": {
     "appId": "onion.app.HistoryShell",
     "asar": true,
-    "extraResources":  {
+    "extraResources": {
       "from": "plugins",
       "to": "plugins"
     },
@@ -50,7 +51,7 @@
       "icon": "assets/image/icon.icns"
     }
   },
-  "repository": "https://github.com/electron/electron-quick-start",
+  "repository": "https://github.com/onion878/history-shell",
   "keywords": [
     "shell",
     "ssh",
@@ -76,6 +77,7 @@
   },
   "devDependencies": {
     "electron": "^11.2.0",
+    "electron-rebuild": "2.0.3",
     "electron-builder": "^22.9.1"
   }
 }

@@ -2,7 +2,8 @@
     import Terminal from './Terminal.svelte';
     import SSHClient from './SSHClient.svelte';
     import {createEventDispatcher} from "svelte";
-    import {closeTerminal} from "./utils";
+    import {closeTerminal, getNow} from "./utils";
+    import ContextMenu from "./ContextMenu.svelte";
 
     const dispatch = createEventDispatcher();
     export let theme, msg, tabs = [], nowTab = 0;
@@ -11,7 +12,7 @@
         dispatch('change', tabs[nowTab]);
     }
     const closeTab = (index, e) => {
-        e.stopPropagation();
+        e?.stopPropagation();
         tabs[index].close = true;
         closeTerminal(tabs[index].id);
         let i = 0;
@@ -45,6 +46,69 @@
                 nowTab = before;
             }
             dispatch('change', tabs[nowTab]);
+        }
+    }
+
+    let menuX, menuY, menuShow = false, nowIndex;
+
+    let menu = [
+        {name: '关闭', key: 'close', icon: 'icofont-close-circled'},
+        {name: '关闭其它', key: 'closeOther', icon: 'icofont-close-circled'},
+        {name: '关闭左侧', key: 'closeLeft', icon: 'icofont-close-circled'},
+        {name: '关闭右侧', key: 'closeRight', icon: 'icofont-close-circled'},
+        {name: '关闭全部', key: 'closeAll', icon: 'icofont-close-circled'},
+    ];
+
+    const menuClick = ({detail}) => {
+        switch (detail.key) {
+            case "close": {
+                closeTab(nowIndex, null);
+                break;
+            }
+            case "closeOther": {
+                tabs.forEach((tab, i) => {
+                    if (i != nowIndex) {
+                        closeTab(i, null);
+                    }
+                });
+                break;
+            }
+            case "closeLeft": {
+                tabs.forEach((tab, i) => {
+                    if (i < nowIndex) {
+                        closeTab(i, null);
+                    }
+                });
+                break;
+            }
+            case "closeRight": {
+                tabs.forEach((tab, i) => {
+                    if (i > nowIndex) {
+                        closeTab(i, null);
+                    }
+                });
+                break;
+            }
+            case "closeAll": {
+                tabs.forEach((tab, i) => {
+                    closeTab(i, null);
+                });
+                break;
+            }
+            default:
+        }
+    }
+
+    const showMenu = (i, e) => {
+        nowIndex = i;
+        menuX = e.clientX;
+        menuY = e.clientY;
+        menuShow = !menuShow;
+    }
+
+    const showStatusBar = ({detail}, i) => {
+        if (nowTab == i) {
+            dispatch('showStatusBar', detail);
         }
     }
 </script>
@@ -127,16 +191,20 @@
     }
 </style>
 
+<ContextMenu bind:theme={theme} bind:data={menu} on:click={menuClick} bind:show={menuShow}
+             bind:x={menuX} bind:y={menuY}
+             width="90"/>
 <div class="tab-header"
      style="background: {theme.colors['sideBar.background']}; color: {theme.colors['sideBar.foreground']};">
     <div class="tab-left">
         {#each tabs as tab, i}
             {#if tab.close === false}
                 <div class="tab-title" on:click={() => changeTab(i)}
+                     on:contextmenu|preventDefault={(e) => showMenu(i, e)}
                      style="background-color: {nowTab == i?'var(--background)':''};display: inline-flex">
                     <div class="tab-icon" style="background-image: url({tab.icon})"></div>
                     <div>
-                        {tab.name}
+                        {(i + 1) + '.' + tab.name}
                         <a class="close-btn" on:click={(e) => closeTab(i, e)}></a>
                     </div>
                 </div>
@@ -150,9 +218,11 @@
         {#if tab.close === false}
             <div class="tab-list" style="display: {nowTab == i? 'block':'none'};">
                 {#if tab.type === 'terminal'}
-                    <Terminal init={nowTab==i} bind:id={tab.id} bind:path={tab.path} {theme}/>
+                    <Terminal init={nowTab==i} bind:id={tab.id} bind:path={tab.path} {theme}
+                              on:showStatusBar={(e) => showStatusBar(e, i)}/>
                 {:else}
-                    <SSHClient init={nowTab==i} bind:id={tab.id} bind:config={tab.config} {theme}/>
+                    <SSHClient init={nowTab==i} bind:id={tab.id} bind:config={tab.config} {theme}
+                               on:showStatusBar={(e) => showStatusBar(e, i)}/>
                 {/if}
             </div>
         {/if}

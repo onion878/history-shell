@@ -124,7 +124,7 @@ class TerminalService extends BaseService {
     setSuperUser() {
         this.sudo = (help.getAppPath() + '/plugins/gsudo.exe').replace(/\\/g, '/');
         this.cancelPty();
-        this.nowPty?.write(this.sudo + '\r');
+        this.nowPty?.write(`"${this.sudo}"\r`);
     }
 
     destroy() {

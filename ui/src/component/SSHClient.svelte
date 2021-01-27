@@ -1,13 +1,18 @@
 <script lang="ts">
     import {watchResize} from "svelte-watch-resize";
-    import {onMount} from "svelte";
-    import {addTerminal, matchSSHPath} from "./utils";
+    import {createEventDispatcher, onMount} from "svelte";
+    import {addTerminal, getNowTime, matchSSHPath} from "./utils";
     import ContextMenu from "./ContextMenu.svelte";
 
     const SSHService = require('./app/cmd/ssh-service');
     const terminal = new SSHService();
     let dom, first: boolean = false;
     export let theme, init, config, id;
+    const dispatch = createEventDispatcher();
+    let startDate: Date = new Date(), endDate: Date;
+    const statusList = [
+        {name: '打开时间:' + getNowTime(), title: startDate.toLocaleTimeString(), icon: 'icofont-clock-time'},
+    ];
     onMount(() => {
         first = true;
         if (init) {
@@ -17,7 +22,35 @@
 
     const initTerminal = () => {
         addTerminal(id, terminal);
-        terminal.init(dom, config);
+        terminal.init(dom, config).then(function () {
+            terminal.runAfter = (() => {
+                startDate = new Date();
+                statusList[1] = {
+                    name: '开始时间:' + getNowTime(startDate),
+                    title: '程序执行命令或打开终端的开始时间:' + startDate.toLocaleTimeString(),
+                    icon: 'icofont-ui-timer'
+                };
+                showStatusBar();
+            });
+            terminal.stream.on('data', function (data) {
+                endDate = new Date();
+                statusList[2] = {
+                    name: '结束时间:' + getNowTime(endDate),
+                    title: '程序执行命令结束或打开终端成功或失败的时间:' + endDate.toLocaleTimeString(),
+                    icon: 'icofont-ui-timer'
+                };
+                statusList[3] = {
+                    name: '执行时间:' + (endDate.getTime() - startDate.getTime()) + 'ms',
+                    title: '前面两个时间的差值',
+                    icon: 'icofont-ui-timer'
+                };
+                showStatusBar();
+            });
+        });
+    }
+
+    const showStatusBar = () => {
+        dispatch('showStatusBar', statusList);
     }
 
     const startTerminal = (flag) => {
@@ -25,6 +58,7 @@
             initTerminal();
         }
         if (flag) {
+            showStatusBar();
             fit();
         }
     }
