@@ -2,7 +2,7 @@
     import Terminal from './Terminal.svelte';
     import SSHClient from './SSHClient.svelte';
     import {createEventDispatcher} from "svelte";
-    import {closeTerminal, getNow} from "./utils";
+    import {closeTerminal} from "./utils";
     import ContextMenu from "./ContextMenu.svelte";
 
     const dispatch = createEventDispatcher();

@@ -10,10 +10,26 @@
         dispatch('click', item);
     }
 
-    hotkeys('esc', function(event, handler){
+    hotkeys('esc', function (event, handler) {
         event.preventDefault();
         show = false;
     });
+
+    const showMenu = (s) => {
+        if (s) {
+            const w = document.body.offsetWidth;
+            const h = document.body.offsetHeight;
+            if (x + parseInt(width + "") > w) {
+                x = w - width;
+            }
+            const height = data.length * 27.6666;
+            if (height + y > h) {
+                y = h - height;
+            }
+        }
+    }
+
+    $:showMenu(show);
 </script>
 
 <style>

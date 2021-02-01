@@ -104,6 +104,7 @@
         line-height: 30px;
         padding: 0px 5px;
         overflow: hidden;
+        word-break: break-all;
     }
 
     .content > .list:hover {

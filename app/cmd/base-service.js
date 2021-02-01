@@ -21,6 +21,7 @@ class BaseService {
         this.history = "";
         this.oldRow = 0;
         this.recordFlag = true;
+        this.readTermFlag = false;
         c.theme({
             danger: c.red,
             dark: c.dim.gray,
@@ -133,8 +134,10 @@ class BaseService {
                     break;
                 }
                 case "Enter": {
+                    that.readTermFlag = true;
                     that.recordHistory(true);
                     this.recordFlag = true;
+                    that.readTermFlag = false;
                     break;
                 }
                 default:
@@ -192,6 +195,7 @@ class BaseService {
 
     writeToXterm(shell) {
         const that = this;
+        if (that.readTermFlag) return;
         this.term?.write(this.changeColor(shell), function () {
             if (that.key == null || that.key.key == 'Enter') {
                 that.recordHistory(false);

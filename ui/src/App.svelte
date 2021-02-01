@@ -56,8 +56,7 @@
         if (tab.id == null) {
             return;
         }
-        let addFlag = true, now;
-        setHistoryName(tab);
+        let addFlag = true, now = -1;
         tabs.some((t, i) => {
             if (t.id == tab.id) {
                 addFlag = false;
@@ -70,8 +69,10 @@
         });
         if (addFlag) {
             tabs.push(tab);
+            tabs = [...tabs];
         }
-        tabs = [...tabs];
+        if (nowTab == now) return;
+        setHistoryName(tab);
         nowTab = null;
         setTimeout(() => {
             if (addFlag) {
@@ -101,8 +102,10 @@
         }
     }
     const changeHistory = ({detail}) => {
-        setNowTerminal(detail.id);
-        setHistoryName(detail);
+        if (detail) {
+            setNowTerminal(detail.id);
+            setHistoryName(detail);
+        }
     }
     const addWrite = ({detail}) => {
         writeTerminal(tabs[nowTab].id, detail.input);

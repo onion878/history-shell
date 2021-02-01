@@ -5,7 +5,7 @@
     import Modal from './Modal.svelte';
     import Input from './Input.svelte';
     import ContextMenu from './ContextMenu.svelte';
-    import {validateData, isEmpty} from './utils';
+    import {validateData, isEmpty, isInit, initSuccess} from './utils';
     import {showConfirm, showError} from './dialog';
 
     export let theme;
@@ -27,7 +27,10 @@
     const getAllTree = () => {
         config.getAllData().then(data => {
             tree = data;
-            treeClick({detail: data[0].children[0]});
+            if (isInit() == false) {
+                treeClick({detail: data[0].children[0]});
+                initSuccess();
+            }
         });
     };
     getAllTree();

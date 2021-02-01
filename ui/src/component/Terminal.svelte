@@ -1,7 +1,7 @@
 <script lang="ts">
     import {watchResize} from "svelte-watch-resize";
     import {createEventDispatcher, onMount} from "svelte";
-    import {addTerminal, getNowTime, isFile, isWin, matchLocalPath, openFile, openFolder} from "./utils";
+    import {addTerminal, formatDuring, getNowTime, isFile, isWin, matchLocalPath, openFile, openFolder} from "./utils";
     import ContextMenu from "./ContextMenu.svelte";
 
     const TerminalService = require('./app/cmd/terminal-service');
@@ -44,7 +44,7 @@
                     icon: 'icofont-ui-timer'
                 };
                 statusList[3] = {
-                    name: '执行时间:' + (endDate.getTime() - startDate.getTime()) + 'ms',
+                    name: '执行时间:' + (formatDuring(endDate.getTime() - startDate.getTime())),
                     title: '前面两个时间的差值',
                     icon: 'icofont-ui-timer'
                 };
@@ -60,10 +60,12 @@
     const startTerminal = (flag) => {
         if (flag && terminal.term == null && first) {
             initTerminal();
+            terminal.term.focus();
         }
         if (flag) {
             showStatusBar();
             fit();
+            terminal.term.focus();
         }
     }
 
