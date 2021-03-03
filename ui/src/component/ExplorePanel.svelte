@@ -2,18 +2,20 @@
     import SideBar from "./SideBar.svelte";
     import ListTree from "./ListTree.svelte";
     import ContextMenu from "./ContextMenu.svelte";
-    import {bytesToSize, getFileInfo, getNow, getNowTerminal, getNowTime, openFolder} from "./utils";
+    import {bytesToSize, getFileInfo, getNow, getNowTerminal, openFolder} from "./utils";
+    import Modal from "./Modal.svelte";
 
     const explore = require('./app/utils/explore');
     let Client = require('./app/utils/sftp'), sftpClient;
     export let theme, showTab;
+    let showInfo = false, titleInfo: string, dataInfo = {};
     let loading = false, menuX, menuY, menuShow = false, nowItem, menu = [
-        {name: '文件管理器中打开', key: 'openInFolder', icon: 'icofont-folder-open'},
+        {name: '文件管理器中打开', key: 'openInFolder', icon: 'icofont-folder-open', show: showTab.type == "terminal"},
         {name: '进入目录', key: 'intoFolder', icon: 'icofont-hand-right'},
         {type: 'separator'},
         {name: '复制路径', key: 'copy', icon: 'icofont-ui-copy'},
         {name: '复制名称', key: 'copy-name', icon: 'icofont-copy'},
-        {name: '属性', key: 'info', icon: 'icofont-info-circle'},
+        {name: '属性', key: 'info', icon: 'icofont-info-circle', show: showTab.type == "terminal"},
     ];
     let tree = [], tools = [
         {key: 'newFolder', icon: 'icofont-ui-folder', title: '新建文件夹'},
@@ -64,7 +66,6 @@
 
     }
     const treeClick = ({detail}) => {
-
     }
     const menuClick = ({detail}) => {
         switch (detail.key) {
@@ -86,11 +87,16 @@
             }
             case "info": {
                 const info = getFileInfo(nowItem.path);
-                console.log(info);
-                console.log('访问时间:', getNow(info.atime));
-                console.log('创建时间:', getNow(info.birthtime));
-                console.log('修改时间:', getNow(info.mtime));
-                console.log(bytesToSize(info.size));
+                const permString = '0' + (info.mode & parseInt('777', 8)).toString(8);
+                dataInfo = {
+                    atime: getNow(info.atime),
+                    birthtime: getNow(info.birthtime),
+                    mtime: getNow(info.mtime),
+                    size: bytesToSize(info.size),
+                    permission: permString
+                };
+                titleInfo = nowItem.name + '-属性';
+                showInfo = true;
                 break;
             }
             default:
@@ -106,6 +112,21 @@
 </script>
 
 <style>
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td, th {
+        border: 1px solid var(--focus-border);
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: var(--focus);
+    }
 </style>
 
 <SideBar bind:theme={theme} title="文件管理器" {tools} on:toolClick={toolClick}>
@@ -121,3 +142,27 @@
 <ContextMenu bind:theme={theme} bind:data={menu} on:click={menuClick} bind:show={menuShow}
              bind:x={menuX} bind:y={menuY}
              width="150"/>
+<Modal bind:show={showInfo} {theme} bind:title={titleInfo} width="300">
+    <table>
+        <tr>
+            <th>访问时间</th>
+            <th>{dataInfo.atime}</th>
+        </tr>
+        <tr>
+            <td>创建时间</td>
+            <td>{dataInfo.birthtime}</td>
+        </tr>
+        <tr>
+            <td>修改时间</td>
+            <td>{dataInfo.mtime}</td>
+        </tr>
+        <tr>
+            <td>文件大小</td>
+            <td>{dataInfo.size}</td>
+        </tr>
+        <tr>
+            <td>文件权限</td>
+            <td>{dataInfo.permission}</td>
+        </tr>
+    </table>
+</Modal>

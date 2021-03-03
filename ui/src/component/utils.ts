@@ -1,3 +1,5 @@
+import {showError} from "./dialog";
+
 declare const process: any;
 
 declare function require(arg: string);
@@ -124,7 +126,12 @@ export function openFile(path: string) {
 }
 
 export function getFileInfo(path: string) {
-    return fs.lstatSync(path);
+    try {
+        return fs.lstatSync(path);
+    } catch (e) {
+        showError(e.message);
+        throw e;
+    }
 }
 
 export function getNow(date: Date = new Date()) {

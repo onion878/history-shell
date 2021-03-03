@@ -80,13 +80,15 @@
   --title-menu-color: {theme.colors['menu.foreground']};
   --title-menu-background: {theme.colors['dropdown.background']};left:{x}px;top:{y}px;width:{width}px">
             {#each data as d}
-                {#if d.type == 'separator'}
-                    <div class="separator"/>
-                {:else}
-                    <div on:click|preventDefault={() => clickMenu(d)}>
-                        <i class={d.icon}></i>
-                        {d.name}
-                    </div>
+                {#if d.show !== false}
+                    {#if d.type == 'separator'}
+                        <div class="separator"/>
+                    {:else}
+                        <div on:click|preventDefault={() => clickMenu(d)}>
+                            <i class={d.icon}></i>
+                            {d.name}
+                        </div>
+                    {/if}
                 {/if}
             {/each}
         </div>

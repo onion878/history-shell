@@ -68,7 +68,7 @@ class BaseService {
             // Initialize xterm.js and attach it to the DOM
             let font = '"Cascadia Code","Fira Mono","IBM Plex Mono","Menlo",Consolas,monospace,monospace',
                 fontSize = 14;
-            const theme = themes[21];
+            const theme = themes[2];
             that.options = {
                 fontSize: fontSize,
                 fontFamily: font,

@@ -35,13 +35,25 @@ class Sftp {
                 if (err) throw err;
                 const roots = [];
                 list.forEach(l => {
-                    const p = '/' + l.filename;
-                    roots.push({
-                        "id": p,
-                        "path": p, "type": "folder", "name": l.filename,
-                        icon: "./assets/image/folder.svg",
-                        children: []
-                    });
+                    const p = (parent ? parent + '/' : '/') + l.filename;
+                    if (l.attrs.isDirectory()) {
+                        roots.push({
+                            id: p,
+                            path: p,
+                            type: "folder",
+                            name: l.filename,
+                            icon: "./assets/image/folder.svg",
+                            children: []
+                        });
+                    } else {
+                        roots.push({
+                            id: p,
+                            path: p,
+                            type: "file",
+                            name: l.filename,
+                            icon: "./assets/image/file.svg"
+                        });
+                    }
                 });
                 resolve(roots);
             });

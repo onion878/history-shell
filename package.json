@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --x64",
+    "dist": "electron-builder --arm64",
     "postinstall": "node prebuild.js && electron-builder install-app-deps",
     "rebuild": "node prebuild.js && electron-rebuild --arch=arm64 --force --version=11.2.0"
   },

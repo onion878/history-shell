@@ -12,7 +12,7 @@
     onMount(() => {
         initFlag = true;
         if (show) {
-            initDrag();
+            initDrag(show);
         }
     });
 
@@ -46,7 +46,7 @@
                 const x = (e.clientX + offset[0]);
                 const y = (e.clientY + offset[1]);
                 let dragX = true, dragY = true;
-                if (x < 0 || x + width > document.body.offsetWidth) {
+                if (x < 0 || x + parseInt(width + "") > document.body.offsetWidth) {
                     dragX = false;
                 }
                 if (y < 0 || y > document.body.offsetHeight - divOverlay.offsetHeight) {
@@ -67,7 +67,7 @@
         dispatch('save');
     }
 
-    hotkeys('esc', function(event, handler){
+    hotkeys('esc', function (event, handler) {
         event.preventDefault();
         show = false;
     });
@@ -86,6 +86,15 @@
     .modal > .modal-header {
         height: 35px;
         width: 100%;
+    }
+
+    .modal > .modal-header > .modal-title {
+        height: 35px;
+        width: calc(100% - 35px);
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        float: left;
     }
 
     .modal > .modal-header > .modal-close {
@@ -127,9 +136,9 @@
 <div class="modal" bind:this={divOverlay}
      style="width: {width}px;background: {theme.colors['editorWidget.background']};display: {show?'block':'none'};">
     <div class="modal-header" bind:this={divDrag}
-         style="background-color: {theme.colors['titleBar.activeBackground']}">
-        &nbsp;&nbsp;{title}
-        <a class="modal-close" on:click={()=> show=false}></a>
+         style="background-color: {theme.colors['titleBar.activeBackground']}" title={title}>
+        <div class="modal-title">&nbsp;{title}</div>
+        <div class="modal-close" on:click={()=> show=false}></div>
     </div>
     <div class="modal-content">
         <slot/>
